@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santi - Asistente Inteligente</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            height: 100vh;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-bottom: 2px solid #f1f5f9;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bot-avatar {
+            position: relative;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: -2px;
+            right: -2px;
+            width: 16px;
+            height: 16px;
+            background: #10b981;
+            border: 3px solid white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .header-text h1 {
+            font-size: 24px;
+            color: #1f2937;
+            font-weight: 700;
+        }
+
+        .header-text p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+
+        .quick-actions {
+            padding: 20px;
+            background: #fafafa;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .quick-actions p {
+            color: #6b7280;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #ede9fe;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6366f1;
+        }
+
+        .action-btn:hover {
+            background: #ddd6fe;
+            transform: translateY(-2px);
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #fafafa;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            max-width: 70%;
+        }
+
+        .message.user .message-content {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .message-avatar.bot {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+        }
+
+        .message-avatar.user {
+            background: #6366f1;
+            color: white;
+        }
+
+        .message-bubble {
+            padding: 16px 20px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .message-bubble.bot {
+            background: white;
+            color: #374151;
+            border-bottom-left-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .message-bubble.user {
+            background: #6366f1;
+            color: white;
+            border-bottom-right-radius: 8px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.7;
+        }
+
+        .typing-indicator {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .typing-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            max-width: 70%;
+        }
+
+        .typing-bubble {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            border-bottom-left-radius: 8px;
+            padding: 16px 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #6366f1;
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        .input-area {
+            background: white;
+            border-top: 2px solid #f1f5f9;
+            padding: 20px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 15px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #messageInput {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 25px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: none;
+            max-height: 120px;
+            min-height: 50px;
+            transition: border-color 0.3s ease;
+        }
+
+        #messageInput:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            background: #6366f1;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            background: #4f46e5;
+            transform: scale(1.05);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .actions-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .action-btn {
+                font-size: 12px;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        .messages-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="bot-avatar">
+                    🤖
+                    <div class="status-indicator"></div>
+                </div>
+                <div class="header-text">
+                    <h1>Santi</h1>
+                    <p>Asistente Inteligente • En línea</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <p>Acciones rápidas:</p>
+            <div class="actions-grid">
+                <button class="action-btn" onclick="setQuickMessage('Necesito ayuda con la estrategia de mi negocio')">
+                    🧠 Estrategia de negocio
+                </button>
+                <button class="action-btn" onclick="setQuickMessage('Quiero crear contenido profesional')">
+                    📝 Crear contenido
+                </button>
+                <button class="action-btn" onclick="setQuickMessage('Tengo un problema que necesito resolver')">
+                    💡 Resolver problema
+                </button>
+                <button class="action-btn" onclick="setQuickMessage('Necesito ayuda técnica')">
+                    ⚙️ Soporte técnico
+                </button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="message bot">
+                <div class="message-content">
+                    <div class="message-avatar bot">🤖</div>
+                    <div class="message-bubble bot">
+                        <div>
+                            Hola! Soy <strong>Santi</strong>, tu asistente inteligente personal. Es un placer conocerte.<br><br>
+                            Estoy aqui para brindarte asistencia excepcional en una amplia variedad de temas y necesidades. Mis capacidades incluyen:<br><br>
+                            ✨ <strong>Analisis y resolucion de problemas</strong><br>
+                            📝 <strong>Creacion de contenido</strong><br>
+                            💼 <strong>Consultoria estrategica</strong><br>
+                            🔧 <strong>Soporte tecnico</strong><br>
+                            📊 <strong>Investigacion y analisis</strong><br>
+                            🎯 <strong>Organizacion y productividad</strong><br><br>
+                            <strong>En que puedo ayudarte hoy?</strong>
+                        </div>
+                        <div class="message-time" id="initialTime"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-area">
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Escribe tu mensaje a Santi..."
+                        onkeypress="handleKeyPress(event)"
+                        oninput="adjustTextareaHeight()"
+                    ></textarea>
+                </div>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let messageId = 0;
+        let isTyping = false;
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('initialTime').textContent = new Date().toLocaleTimeString();
+        });
+
+        // Respuestas de Santi
+        function generateSantiResponse(userMessage) {
+            const message = userMessage.toLowerCase();
+            
+            if (message.includes('hola') || message.includes('buenos dias') || message.includes('buenas tardes')) {
+                return 'Hola! Un gusto saludarte. Soy Santi y estoy aqui para ayudarte de la manera mas eficiente posible. En que puedo asistirte hoy?';
+            }
+            
+            if (message.includes('negocio') || message.includes('empresa') || message.includes('estrategia')) {
+                return 'Excelente! Me especializo en consultoria empresarial y estrategica. Puedo ayudarte con:<br><br>• Analisis de mercado y competencia<br>• Desarrollo de estrategias de crecimiento<br>• Optimizacion de procesos<br>• Planificacion estrategica<br><br>Podrias contarme mas detalles sobre tu situacion especifica?';
+            }
+            
+            if (message.includes('contenido') || message.includes('escribir') || message.includes('redactar')) {
+                return 'Perfecto, la creacion de contenido es una de mis fortalezas. Puedo ayudarte con:<br><br>📝 <strong>Copywriting profesional</strong><br>📰 <strong>Articulos y blogs</strong><br>📧 <strong>Emails marketing</strong><br>📱 <strong>Content para redes sociales</strong><br>📊 <strong>Reportes y presentaciones</strong><br><br>Que tipo de contenido necesitas crear?';
+            }
+            
+            if (message.includes('problema') || message.includes('ayuda') || message.includes('resolver')) {
+                return 'Entiendo que necesitas resolver algo importante. Mi enfoque es:<br><br>1️⃣ <strong>Analisis profundo</strong> del problema<br>2️⃣ <strong>Identificacion</strong> de causas raiz<br>3️⃣ <strong>Generacion</strong> de soluciones creativas<br>4️⃣ <strong>Plan de accion</strong> concreto<br><br>Comparteme los detalles y trabajemos juntos en encontrar la mejor solucion.';
+            }
+            
+            if (message.includes('tecnologia') || message.includes('tecnico') || message.includes('software')) {
+                return 'Perfecto! Tengo solidos conocimientos tecnicos. Puedo asistirte con:<br><br>💻 <strong>Desarrollo y programacion</strong><br>🔧 <strong>Troubleshooting tecnico</strong><br>📱 <strong>Soluciones digitales</strong><br>⚙️ <strong>Automatizacion de procesos</strong><br>🛡️ <strong>Ciberseguridad basica</strong><br><br>Cual es tu desafio tecnico especifico?';
+            }
+            
+            if (message.includes('datos') || message.includes('analisis') || message.includes('investigacion')) {
+                return 'Excelente eleccion. El analisis de datos es clave para tomar decisiones inteligentes. Puedo ayudarte con:<br><br>📊 <strong>Interpretacion de datos</strong><br>📈 <strong>Analisis de tendencias</strong><br>🔍 <strong>Investigacion de mercado</strong><br>📋 <strong>Reportes ejecutivos</strong><br>💡 <strong>Insights accionables</strong><br><br>Que datos necesitas analizar o que investigacion requieres?';
+            }
+            
+            if (message.includes('organizar') || message.includes('productividad') || message.includes('planificar')) {
+                return 'La organizacion y productividad son fundamentales para el exito. Te puedo ayudar con:<br><br>⏰ <strong>Gestion del tiempo</strong><br>📅 <strong>Planificacion de proyectos</strong><br>✅ <strong>Sistemas de productividad</strong><br>🎯 <strong>Definicion de objetivos</strong><br>📋 <strong>Optimizacion de workflows</strong><br><br>Que aspecto de tu organizacion quieres mejorar?';
+            }
+            
+            if (message.includes('gracias') || message.includes('perfecto') || message.includes('excelente')) {
+                return 'Me alegra poder ayudarte! Mi objetivo es siempre brindarte el mejor soporte posible. Si necesitas algo mas o quieres profundizar en algun tema, no dudes en preguntarme. Estoy aqui para ti.';
+            }
+            
+            return 'Entiendo tu consulta sobre "<strong>' + userMessage + '</strong>". Como Santi, me gusta ser preciso y util en mis respuestas.<br><br>Para darte la mejor asistencia posible, podrias proporcionarme un poco mas de contexto? Por ejemplo:<br><br>• Cual es tu objetivo principal?<br>• Hay algun plazo especifico?<br>• Que has intentado hasta ahora?<br><br>Con esta informacion podre ofrecerte una solucion mas personalizada y efectiva. 🎯';
+        }
+
+        function setQuickMessage(message) {
+            document.getElementById('messageInput').value = message;
+            document.getElementById('messageInput').focus();
+        }
+
+        function adjustTextareaHeight() {
+            const textarea = document.getElementById('messageInput');
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message || isTyping) return;
+
+            // Agregar mensaje del usuario
+            addMessage(message, 'user');
+            
+            // Limpiar input
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Mostrar indicador de escritura
+            showTypingIndicator();
+            
+            // Generar respuesta después de un delay
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = generateSantiResponse(message);
+                addMessage(response, 'bot');
+            }, 1500);
+        }
+
+        function addMessage(content, type) {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const time = new Date().toLocaleTimeString();
+            const avatar = type === 'bot' ? '🤖' : '👤';
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-avatar ${type}">${avatar}</div>
+                    <div class="message-bubble ${type}">
+                        <div>${content}</div>
+                        <div class="message-time">${time}</div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            if (isTyping) return;
+            
+            isTyping = true;
+            const container = document.getElementById('messagesContainer');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            sendBtn.disabled = true;
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typingIndicator';
+            
+            typingDiv.innerHTML = `
+                <div class="typing-content">
+                    <div class="message-avatar bot">🤖</div>
+                    <div class="typing-bubble">
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            isTyping = false;
+            const typingIndicator = document.getElementById('typingIndicator');
+            const sendBtn = document.getElementById('sendBtn');
+            
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+            
+            sendBtn.disabled = false;
+        }
+    </script>
+</body>
+</html>
