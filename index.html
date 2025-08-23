@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Santi - Asistente Inteligente Avanzado</title>
+    <title>Asistente Inteligente Avanzado</title>
     <style>
         * {
             margin: 0;
@@ -413,8 +413,8 @@
                     <div class="status-indicator"></div>
                 </div>
                 <div class="header-text">
-                    <h1>Santi AI</h1>
-                    <p>Asistente Inteligente Avanzado • Procesando contexto</p>
+                    <h1>Asistente Inteligente</h1>
+                    <p>Tu compañero de IA para la innovación y la productividad</p>
                 </div>
                 <div class="intelligence-indicator">
                     🚀 IA Avanzada
@@ -424,19 +424,19 @@
 
         <!-- Quick Actions -->
         <div class="quick-actions">
-            <p>🎯 Especialidades avanzadas:</p>
+            <p>💡 ¿Cómo puedo ayudarte a empezar?</p>
             <div class="actions-grid">
-                <button class="action-btn" onclick="setQuickMessage('Necesito una estrategia completa para expandir mi negocio tecnológico')">
-                    🚀 Estrategia empresarial avanzada
+                <button class="action-btn" onclick="setQuickMessage('Quiero una estrategia para hacer crecer mi negocio.')">
+                    🚀 Dame una estrategia de negocio
                 </button>
-                <button class="action-btn" onclick="setQuickMessage('Ayúdame a crear un plan de marketing digital integral')">
-                    📈 Marketing digital completo
+                <button class="action-btn" onclick="setQuickMessage('Necesito un plan de marketing digital innovador.')">
+                    📈 Crea un plan de marketing
                 </button>
-                <button class="action-btn" onclick="setQuickMessage('Necesito resolver un problema complejo de productividad')">
-                    🧩 Solución de problemas complejos
+                <button class="action-btn" onclick="setQuickMessage('Ayúdame a optimizar mis procesos de trabajo.')">
+                    ⚡ Optimiza mis procesos
                 </button>
-                <button class="action-btn" onclick="setQuickMessage('Quiero optimizar completamente mis procesos de trabajo')">
-                    ⚡ Optimización avanzada
+                <button class="action-btn" onclick="setQuickMessage('Hagamos una sesión de brainstorming para una nueva idea.')">
+                    🧠 Hagamos brainstorming
                 </button>
             </div>
         </div>
@@ -448,15 +448,7 @@
                     <div class="message-avatar bot">🧠</div>
                     <div class="message-bubble bot">
                         <div>
-                            ¡Hola! Soy <strong>Santi AI</strong>, tu asistente inteligente de nueva generación. He evolucionado significativamente y ahora poseo capacidades avanzadas:<br><br>
-                            🧠 <strong>Procesamiento avanzado de lenguaje natural</strong><br>
-                            🎯 <strong>Análisis contextual profundo</strong><br>
-                            💭 <strong>Memoria de conversación inteligente</strong><br>
-                            🔍 <strong>Detección de patrones y emociones</strong><br>
-                            📊 <strong>Razonamiento analítico complejo</strong><br>
-                            🚀 <strong>Soluciones personalizadas avanzadas</strong><br><br>
-                            Puedo recordar nuestra conversación, analizar el contexto emocional, detectar patrones en tus consultas y ofrecer respuestas cada vez más precisas y personalizadas.<br><br>
-                            <strong>¿En qué desafío complejo puedo ayudarte hoy?</strong>
+                            ¡Hola! Soy tu asistente inteligente y me da mucho gusto conocerte. <br><br>Para poder brindarte una experiencia más personalizada, ¿me podrías decir tu nombre?
                         </div>
                         <div class="message-time" id="initialTime"></div>
                     </div>
@@ -483,11 +475,13 @@
     </div>
 
     <script>
-        // Sistema de IA avanzado para Santi
+        // Sistema de IA avanzado para el Asistente Inteligente
         let messageId = 0;
         let isTyping = false;
         let conversationHistory = [];
         let userProfile = {
+            name: null,
+            nameKnown: false,
             interests: [],
             communicationStyle: 'formal',
             previousTopics: [],
@@ -527,7 +521,7 @@
         });
 
         function initializeIntelligence() {
-            console.log('🧠 Santi AI inicializado con capacidades avanzadas');
+            console.log('🧠 Asistente Inteligente inicializado con capacidades avanzadas');
         }
 
         // Análisis avanzado de texto
@@ -580,6 +574,7 @@
 
         function detectIntent(text) {
             const intents = {
+                creator_query: ['creador', 'creó', 'hizo', 'empresa', 'detrás de ti', 'innovationx', 'az innovationx'],
                 question: ['como', 'que', 'donde', 'cuando', 'por que', 'cual'],
                 request: ['ayuda', 'necesito', 'quiero', 'podrias', 'me gustaria'],
                 problem: ['problema', 'error', 'falla', 'no funciona', 'dificultad'],
@@ -618,14 +613,21 @@
             thinkingProcess = '🧠 Analizando: Sentimiento ' + analysis.sentiment + ', Complejidad ' + analysis.complexity + ', Intención ' + analysis.intent;
             
             // Respuesta basada en análisis
-            if (analysis.intent === 'problem') {
+            if (analysis.intent === 'creator_query') {
+                response = generateCreatorResponse();
+            } else if (analysis.intent === 'problem') {
                 response = generateProblemSolvingResponse(userMessage, analysis);
             } else if (analysis.topics.length > 0) {
                 response = generateTopicBasedResponse(userMessage, analysis);
             } else if (analysis.complexity === 'high') {
                 response = generateComplexResponse(userMessage, analysis);
             } else {
-                response = generateContextualResponse(userMessage, analysis);
+                // If intent is general and no specific topics were found, the bot likely doesn't know.
+                if (analysis.intent === 'general' && analysis.topics.length === 0) {
+                    response = generateIDontKnowResponse();
+                } else {
+                    response = generateContextualResponse(userMessage, analysis);
+                }
             }
             
             // Personalizar respuesta según perfil
@@ -638,7 +640,8 @@
         }
 
         function generateProblemSolvingResponse(message, analysis) {
-            const problemSolvingFramework = 'Entiendo que tienes un desafío que resolver. Aplicaré mi metodología avanzada de resolución de problemas:<br><br>' +
+            const name = userProfile.name ? `, ${userProfile.name}` : '';
+            const problemSolvingFramework = `Entiendo que tienes un desafío que resolver${name}. Aplicaré mi metodología avanzada de resolución de problemas:<br><br>` +
                 '🔍 <strong>Análisis del problema:</strong> He detectado que tu consulta tiene un nivel de urgencia ' + analysis.urgency + ' y complejidad ' + analysis.complexity + '.<br><br>' +
                 '🧠 <strong>Enfoque estructurado:</strong><br>' +
                 '1️⃣ <strong>Definición clara</strong> del problema central<br>' +
@@ -662,45 +665,80 @@
         }
 
         function generateComplexResponse(message, analysis) {
-            return 'He analizado tu consulta compleja y detallada. Aprecio que hayas proporcionado contexto suficiente para un análisis profundo.<br><br>' +
-                    '🎯 <strong>Mi enfoque será:</strong><br>' +
-                    '• Desglosar tu consulta en componentes manejables<br>' +
-                    '• Aplicar frameworks específicos para cada área<br>' +
-                    '• Proporcionar soluciones integradas y escalables<br>' +
-                    '• Crear un roadmap detallado de implementación<br><br>' +
-                    'Basándome en tus palabras clave principales: <em>' + analysis.keywords.join(', ') + '</em>, veo que necesitas una solución integral.';
+            const name = userProfile.name ? `, ${userProfile.name}` : '';
+            let response = `Interesante desafío el que planteas${name}.<br><br>`;
+            
+            response += `🔍 <strong>Análisis Rápido:</strong> Veo que tu consulta involucra los siguientes temas clave: <em>${analysis.keywords.join(', ')}</em>. Tiene una complejidad ${analysis.complexity} y un sentimiento general ${analysis.sentiment}.<br><br>`;
+            
+            response += `🗺️ <strong>Estructura de la Solución:</strong> Para darte la mejor respuesta, te propongo abordar esto en 3 pasos:<br>
+            1. <strong>Análisis Detallado:</strong> Profundizar en cada uno de los componentes de tu solicitud.<br>
+            2. <strong>Propuesta de Solución:</strong> Presentarte un plan de acción o una respuesta estructurada.<br>
+            3. <strong>Siguientes Pasos:</strong> Definir cómo podemos continuar y refinar la solución.<br><br>`;
+
+            response += `Para comenzar con el primer paso, ¿podrías darme un poco más de contexto sobre alguno de los temas que mencionaste? O si lo prefieres, puedo empezar con una solución general basada en la información que ya me diste.`;
+
+            return response;
         }
 
         function generateContextualResponse(message, analysis) {
+            const name = userProfile.name ? userProfile.name : 'tú';
+            const lastTopic = userProfile.previousTopics.length > 0 ? userProfile.previousTopics[userProfile.previousTopics.length - 1] : null;
+
+            if (lastTopic && Math.random() < 0.5) {
+                return `Interesante pregunta, ${name}. Por lo que recuerdo, hace poco hablamos sobre '${lastTopic}'. ¿Esto que me preguntas ahora se relaciona con ese tema?`;
+            }
+
             const contextResponses = [
-                'Interesante perspectiva. He notado un patrón en nuestras conversaciones que me permite ofrecerte una respuesta más personalizada.',
-                'Basándome en tu estilo de comunicación y consultas anteriores, puedo adaptar mi respuesta a tus necesidades específicas.',
+                `Buena pregunta, ${name}. He notado un patrón en nuestras conversaciones que me permite ofrecerte una respuesta más personalizada.`,
+                `Basándome en tu estilo de comunicación y consultas anteriores, ${name}, puedo adaptar mi respuesta a tus necesidades específicas.`,
                 'Tu enfoque ' + analysis.sentiment + ' hacia este tema me ayuda a calibrar la mejor manera de asistirte.'
             ];
             return contextResponses[Math.floor(Math.random() * contextResponses.length)];
         }
 
+        function generateCreatorResponse() {
+            return `Fui creado por Az InnovationX, una empresa innovadora especializada en soluciones tecnológicas avanzadas.<br>
+Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
+🌐 Sitio web: <a href="https://az-innovation-x.vercel.app/" target="_blank">https://az-innovation-x.vercel.app/</a><br>
+📘 Facebook: <a href="https://www.facebook.com/AzInnovationX?mibextid=ZbWKwL" target="_blank">AzInnovationX en Facebook</a><br>
+🎵 TikTok: <a href="https://www.tiktok.com/@innovationx09?_t=ZS-8z7nlnJKq2C&_r=1" target="_blank">@innovationx09 en TikTok</a><br><br>
+Az InnovationX se dedica a crear experiencias digitales inteligentes y soluciones que realmente conectan con las personas. ¡Estoy orgulloso de ser parte de sus innovaciones!`;
+        }
+
+        function generateIDontKnowResponse() {
+            const name = userProfile.name ? `, ${userProfile.name}` : '';
+            const responses = [
+                `Esa es una pregunta muy interesante${name}. No estoy seguro de tener la respuesta correcta en mi base de conocimiento actual. ¿Podrías reformularla o darme un poco más de detalle?`,
+                `Hmm, eso me ha puesto a pensar. No tengo información específica sobre ese tema${name}. Agradezco que me ayudes a aprender. ¿Podemos intentar enfocarlo desde otro ángulo?`,
+                `Admito que no lo sé todo${name}. Sobre este tema en particular no tengo una respuesta. Sin embargo, puedo intentar buscar información relacionada si lo deseas.`
+            ];
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
         function personalizeResponse(response, sentiment) {
+            const name = userProfile.name ? `, ${userProfile.name}` : '';
             if (sentiment === 'positive') {
-                response += '<br><br>🌟 Me alegra ver tu actitud positiva hacia este tema. Eso facilitará mucho la implementación de las soluciones.';
+                response += `<br><br>🌟 Me alegra ver tu entusiasmo sobre este tema${name}. ¡Esa es la actitud para lograr grandes cosas!`;
             } else if (sentiment === 'negative') {
-                response += '<br><br>🤝 Entiendo que puede ser un momento desafiante. Trabajemos juntos para convertir estos obstáculos en oportunidades.';
+                response += `<br><br>🤝 Entiendo que esto puede ser frustrante${name}. No te preocupes, estoy aquí para ayudarte a superarlo. Trabajemos juntos para convertir estos obstáculos en oportunidades.`;
+            } else if (sentiment === 'neutral' && Math.random() < 0.3) { // Occasionally add a personal touch
+                response += `<br><br>Es un punto interesante${name}. Sigamos profundizando en ello.`;
             }
             return response;
         }
 
         function generateIntelligentSuggestions(analysis) {
-            let suggestions = '<br><br>💡 <strong>Sugerencias inteligentes basadas en tu consulta:</strong><br>';
+            let suggestions = '<br><br>💡 <strong>Sugerencias inteligentes para seguir avanzando:</strong><br>';
             
             if (analysis.urgency === 'high') {
-                suggestions += '⚡ Como es urgente, te propongo empezar con las acciones de mayor impacto inmediato.<br>';
+                suggestions += '⚡ Dado que esto es urgente, ¿te parece si priorizamos las acciones con mayor impacto inmediato?<br>';
             }
             
             if (analysis.complexity === 'high') {
-                suggestions += '🧩 Para manejar la complejidad, podríamos dividir esto en fases incrementales.<br>';
+                suggestions += '🧩 Para manejar mejor esta complejidad, podríamos desglosar el problema en fases más pequeñas. ¿Qué opinas?<br>';
             }
             
-            suggestions += '📚 ¿Te gustaría que profundice en algún aspecto específico o prefieres un overview completo?';
+            suggestions += '📚 ¿Prefieres que profundice en algún aspecto, te dé una explicación más técnica o busque ejemplos prácticos?';
             
             return suggestions;
         }
@@ -757,6 +795,22 @@
             
             // Mostrar indicador de escritura
             showTypingIndicator();
+
+            // --- INICIO: Lógica de captura de nombre ---
+            if (!userProfile.nameKnown) {
+                userProfile.name = message;
+                userProfile.nameKnown = true;
+
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const welcomeMessage = `¡Perfecto, ${userProfile.name}! Es un placer conocerte. Estoy aquí para ayudarte con cualquier pregunta, proyecto o desafío que tengas. <br><br>¿En qué puedo asistirte hoy?`;
+                    addMessage(welcomeMessage, 'bot');
+                    conversationHistory.push({type: 'bot', content: welcomeMessage, timestamp: new Date()});
+                }, 1500);
+
+                return; // Detener la ejecución normal
+            }
+            // --- FIN: Lógica de captura de nombre ---
             
             // Analizar mensaje y generar respuesta
             setTimeout(() => {
@@ -929,7 +983,7 @@
                 userProfile.communicationStyle = 'concise';
             }
             
-            console.log('📚 Santi AI aprendiendo de la interacción...', {
+            console.log('📚 Asistente Inteligente aprendiendo de la interacción...', {
                 userStyle: userProfile.communicationStyle,
                 interests: userProfile.interests,
                 expertise: userProfile.expertise.slice(-3)
@@ -978,11 +1032,11 @@
                 return greetings[Math.floor(Math.random() * greetings.length)];
             }
             
-            return '¡Hola! Soy Santi AI, listo para ayudarte con cualquier desafío.';
+            return '¡Hola! Soy tu Asistente Inteligente, listo para ayudarte con cualquier desafío.';
         }
 
         // Inicializar sistema inteligente
-        console.log('🚀 Santi AI - Sistema Inteligente Avanzado Cargado');
+        console.log('🚀 Asistente Inteligente - Sistema Avanzado Cargado');
         console.log('💡 Capacidades: Análisis NLP, Memoria Contextual, Aprendizaje Adaptativo');
     </script>
 </body>
