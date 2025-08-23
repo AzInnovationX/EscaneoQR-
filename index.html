@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Asistente Inteligente Avanzado</title>
+    <title>Chatbot Amistoso</title>
     <style>
         * {
             margin: 0;
@@ -100,61 +100,6 @@
             font-weight: 500;
         }
 
-        .intelligence-indicator {
-            position: absolute;
-            right: 25px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 14px;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-        }
-
-        .quick-actions {
-            padding: 25px;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-bottom: 2px solid #e2e8f0;
-        }
-
-        .quick-actions p {
-            color: #475569;
-            font-size: 16px;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-
-        .actions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 18px;
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 15px;
-            font-weight: 600;
-            color: #334155;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-
-        .action-btn:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-
         .messages-container {
             flex: 1;
             overflow-y: auto;
@@ -237,17 +182,6 @@
             margin-top: 10px;
             opacity: 0.7;
             font-weight: 500;
-        }
-
-        .thinking-process {
-            background: linear-gradient(135deg, #fef3c7, #fde68a);
-            border: 2px solid #f59e0b;
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-            font-size: 14px;
-            color: #92400e;
-            font-weight: 600;
         }
 
         .typing-indicator {
@@ -361,25 +295,11 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .actions-grid {
-                grid-template-columns: 1fr;
-            }
-            
             .message-content {
                 max-width: 90%;
             }
-            
-            .action-btn {
-                font-size: 14px;
-                padding: 15px;
-            }
-            
             .chat-container {
                 border-radius: 0;
-            }
-
-            .intelligence-indicator {
-                display: none;
             }
         }
 
@@ -413,31 +333,9 @@
                     <div class="status-indicator"></div>
                 </div>
                 <div class="header-text">
-                    <h1>Asistente Inteligente</h1>
-                    <p>Tu compañero de IA para la innovación y la productividad</p>
+                    <h1>Chatbot Amistoso</h1>
+                    <p>¡Hola! Estoy aquí para charlar contigo.</p>
                 </div>
-                <div class="intelligence-indicator">
-                    🚀 IA Avanzada
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-            <p>💡 ¿Cómo puedo ayudarte a empezar?</p>
-            <div class="actions-grid">
-                <button class="action-btn" onclick="setQuickMessage('Quiero una estrategia para hacer crecer mi negocio.')">
-                    🚀 Dame una estrategia de negocio
-                </button>
-                <button class="action-btn" onclick="setQuickMessage('Necesito un plan de marketing digital innovador.')">
-                    📈 Crea un plan de marketing
-                </button>
-                <button class="action-btn" onclick="setQuickMessage('Ayúdame a optimizar mis procesos de trabajo.')">
-                    ⚡ Optimiza mis procesos
-                </button>
-                <button class="action-btn" onclick="setQuickMessage('Hagamos una sesión de brainstorming para una nueva idea.')">
-                    🧠 Hagamos brainstorming
-                </button>
             </div>
         </div>
 
@@ -448,7 +346,7 @@
                     <div class="message-avatar bot">🧠</div>
                     <div class="message-bubble bot">
                         <div>
-                            ¡Hola! Soy tu asistente inteligente y me da mucho gusto conocerte. <br><br>Para poder brindarte una experiencia más personalizada, ¿me podrías decir tu nombre?
+                            ¡Hola! Me da gusto conocerte. <br><br>Para empezar, ¿cómo te llamas?
                         </div>
                         <div class="message-time" id="initialTime"></div>
                     </div>
@@ -462,7 +360,7 @@
                 <div class="input-wrapper">
                     <textarea 
                         id="messageInput" 
-                        placeholder="Describe tu consulta con todo el detalle que necesites..."
+                        placeholder="Escribe tu mensaje..."
                         onkeypress="handleKeyPress(event)"
                         oninput="adjustTextareaHeight()"
                     ></textarea>
@@ -475,71 +373,42 @@
     </div>
 
     <script>
-        // Sistema de IA avanzado para el Asistente Inteligente
-        let messageId = 0;
+        // --- Comienzo del script del Chatbot Amistoso ---
         let isTyping = false;
-        let conversationHistory = [];
         let userProfile = {
             name: null,
             nameKnown: false,
-            interests: [],
-            communicationStyle: 'formal',
-            previousTopics: [],
-            emotionalState: 'neutral',
-            expertise: [],
-            goals: []
         };
+        let conversationHistory = [];
 
-        // Base de conocimiento expandida
-        const knowledgeBase = {
-            business: {
-                strategies: ['growth hacking', 'lean startup', 'design thinking', 'agile', 'digital transformation'],
-                metrics: ['KPI', 'ROI', 'CAC', 'LTV', 'churn rate', 'conversion'],
-                frameworks: ['OKRs', 'SMART goals', 'SWOT', 'Porter 5 forces', 'Business Model Canvas']
-            },
-            technology: {
-                languages: ['javascript', 'python', 'java', 'react', 'node.js', 'sql'],
-                concepts: ['cloud computing', 'AI', 'machine learning', 'blockchain', 'APIs'],
-                tools: ['git', 'docker', 'aws', 'kubernetes', 'tensorflow']
-            },
-            marketing: {
-                channels: ['SEO', 'SEM', 'social media', 'email marketing', 'content marketing'],
-                strategies: ['inbound', 'outbound', 'viral marketing', 'influencer marketing'],
-                metrics: ['CTR', 'CPM', 'CPC', 'ROAS', 'engagement rate']
-            },
-            productivity: {
-                methods: ['GTD', 'pomodoro', 'eisenhower matrix', 'time blocking', 'kanban'],
-                tools: ['notion', 'asana', 'trello', 'slack', 'calendly'],
-                concepts: ['deep work', 'flow state', 'batch processing', 'automation']
-            }
-        };
+        const conversationalResponses = [
+            "¡Qué interesante! Cuéntame más.",
+            "Eso suena fascinante. ¿Y qué más?",
+            "Entiendo. ¿Hay algo más en lo que pienses?",
+            "Gracias por compartir. ¿Qué más te gustaría conversar?",
+            "Me parece un buen punto. Sigamos charlando.",
+            "Es una perspectiva muy válida.",
+            "Disfruto mucho esta conversación contigo.",
+            "Haces que pensar sea muy entretenido."
+        ];
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('initialTime').textContent = new Date().toLocaleTimeString();
-            initializeIntelligence();
+            console.log('🧠 Chatbot Amistoso inicializado.');
         });
 
-        function initializeIntelligence() {
-            console.log('🧠 Asistente Inteligente inicializado con capacidades avanzadas');
-        }
-
-        // Análisis avanzado de texto
+        // Análisis de texto simplificado
         function analyzeText(text) {
-            const analysis = {
+            return {
                 sentiment: analyzeSentiment(text),
-                complexity: analyzeComplexity(text),
-                topics: extractTopics(text),
-                intent: detectIntent(text),
-                urgency: detectUrgency(text),
-                keywords: extractKeywords(text)
+                isCreatorQuery: detectCreatorQuery(text)
             };
-            return analysis;
         }
 
         function analyzeSentiment(text) {
-            const positiveWords = ['excelente', 'bueno', 'perfecto', 'genial', 'increible', 'fantastico', 'amor', 'feliz'];
-            const negativeWords = ['malo', 'terrible', 'odio', 'problema', 'dificil', 'frustrado', 'imposible'];
+            const positiveWords = ['excelente', 'bueno', 'perfecto', 'genial', 'increible', 'fantastico', 'amor', 'feliz', 'sí', 'gracias'];
+            const negativeWords = ['malo', 'terrible', 'odio', 'problema', 'dificil', 'frustrado', 'imposible', 'no'];
             
             let score = 0;
             const words = text.toLowerCase().split(' ');
@@ -554,146 +423,29 @@
             return 'neutral';
         }
 
-        function analyzeComplexity(text) {
-            if (text.length > 200) return 'high';
-            if (text.length > 100) return 'medium';
-            return 'low';
+        function detectCreatorQuery(text) {
+            const creatorWords = ['creador', 'creó', 'hizo', 'empresa', 'programador', 'desarrollador', 'innovationx', 'az innovationx'];
+            return creatorWords.some(word => text.toLowerCase().includes(word));
         }
 
-        function extractTopics(text) {
-            const topics = [];
-            Object.keys(knowledgeBase).forEach(category => {
-                Object.values(knowledgeBase[category]).flat().forEach(topic => {
-                    if (text.toLowerCase().includes(topic)) {
-                        topics.push({category, topic});
-                    }
-                });
-            });
-            return topics;
-        }
-
-        function detectIntent(text) {
-            const intents = {
-                creator_query: ['creador', 'creó', 'hizo', 'empresa', 'detrás de ti', 'innovationx', 'az innovationx'],
-                question: ['como', 'que', 'donde', 'cuando', 'por que', 'cual'],
-                request: ['ayuda', 'necesito', 'quiero', 'podrias', 'me gustaria'],
-                problem: ['problema', 'error', 'falla', 'no funciona', 'dificultad'],
-                planning: ['plan', 'estrategia', 'organizar', 'programar', 'planificar']
-            };
-            
-            for (let intent in intents) {
-                if (intents[intent].some(word => text.toLowerCase().includes(word))) {
-                    return intent;
-                }
+        // Generador de respuestas conversacionales
+        function generateResponse(userMessage, analysis) {
+            if (analysis.isCreatorQuery) {
+                return generateCreatorResponse();
             }
-            return 'general';
-        }
 
-        function detectUrgency(text) {
-            const urgentWords = ['urgente', 'rapido', 'inmediato', 'ahora', 'ya', 'pronto'];
-            return urgentWords.some(word => text.toLowerCase().includes(word)) ? 'high' : 'normal';
-        }
-
-        function extractKeywords(text) {
-            const words = text.toLowerCase().split(' ');
-            const stopWords = ['el', 'la', 'de', 'que', 'y', 'a', 'en', 'un', 'es', 'se', 'no', 'te', 'lo', 'le', 'da', 'su', 'por', 'son', 'con', 'para', 'mi', 'tu', 'si'];
-            return words.filter(word => word.length > 3 && !stopWords.includes(word)).slice(0, 5);
-        }
-
-        // Generador de respuestas inteligentes
-        function generateAdvancedResponse(userMessage, analysis) {
-            // Actualizar perfil del usuario
-            updateUserProfile(analysis);
-            
-            // Generar respuesta contextual
-            let response = '';
-            let thinkingProcess = '';
-            
-            // Mostrar proceso de pensamiento
-            thinkingProcess = '🧠 Analizando: Sentimiento ' + analysis.sentiment + ', Complejidad ' + analysis.complexity + ', Intención ' + analysis.intent;
-            
-            // Respuesta basada en análisis
-            if (analysis.intent === 'creator_query') {
-                response = generateCreatorResponse();
-            } else if (analysis.intent === 'problem') {
-                response = generateProblemSolvingResponse(userMessage, analysis);
-            } else if (analysis.topics.length > 0) {
-                response = generateTopicBasedResponse(userMessage, analysis);
-            } else if (analysis.complexity === 'high') {
-                response = generateComplexResponse(userMessage, analysis);
-            } else {
-                // If intent is general and no specific topics were found, the bot likely doesn't know.
-                if (analysis.intent === 'general' && analysis.topics.length === 0) {
-                    response = generateIDontKnowResponse();
-                } else {
-                    response = generateContextualResponse(userMessage, analysis);
-                }
-            }
-            
-            // Personalizar respuesta según perfil
-            response = personalizeResponse(response, analysis.sentiment);
-            
-            // Agregar sugerencias inteligentes
-            response += generateIntelligentSuggestions(analysis);
-            
-            return {response, thinkingProcess};
-        }
-
-        function generateProblemSolvingResponse(message, analysis) {
             const name = userProfile.name ? `, ${userProfile.name}` : '';
-            const problemSolvingFramework = `Entiendo que tienes un desafío que resolver${name}. Aplicaré mi metodología avanzada de resolución de problemas:<br><br>` +
-                '🔍 <strong>Análisis del problema:</strong> He detectado que tu consulta tiene un nivel de urgencia ' + analysis.urgency + ' y complejidad ' + analysis.complexity + '.<br><br>' +
-                '🧠 <strong>Enfoque estructurado:</strong><br>' +
-                '1️⃣ <strong>Definición clara</strong> del problema central<br>' +
-                '2️⃣ <strong>Análisis de causas raíz</strong> usando técnicas avanzadas<br>' +
-                '3️⃣ <strong>Generación de soluciones</strong> múltiples y creativas<br>' +
-                '4️⃣ <strong>Evaluación de viabilidad</strong> y impacto<br>' +
-                '5️⃣ <strong>Plan de implementación</strong> paso a paso<br><br>' +
-                'Para ofrecerte la solución más efectiva, necesito entender mejor algunos aspectos específicos:';
-            return problemSolvingFramework;
-        }
 
-        function generateTopicBasedResponse(message, analysis) {
-            const mainTopic = analysis.topics[0];
-            const responses = {
-                business: 'Excelente, estamos hablando de ' + mainTopic.topic + ' en el contexto empresarial. Mi análisis indica que tienes un enfoque ' + analysis.sentiment + ' hacia este tema. Puedo ayudarte con estrategias avanzadas, análisis de mercado, y implementación de mejores prácticas.',
-                technology: 'Perfecto, detecté que necesitas ayuda con ' + mainTopic.topic + '. Como especialista en tecnología, puedo guiarte desde conceptos fundamentales hasta implementaciones avanzadas, considerando las mejores prácticas actuales.',
-                marketing: 'Genial, vamos a trabajar en ' + mainTopic.topic + '. Mi enfoque combina estrategias probadas con innovaciones recientes en marketing digital. Analizaré tu situación específica para crear un plan personalizado.',
-                productivity: 'Entiendo que quieres optimizar tu ' + mainTopic.topic + '. Basándome en metodologías avanzadas y tu perfil de trabajo, puedo diseñar un sistema personalizado que maximice tu eficiencia.'
-            };
-            return responses[mainTopic.category] || responses.business;
-        }
-
-        function generateComplexResponse(message, analysis) {
-            const name = userProfile.name ? `, ${userProfile.name}` : '';
-            let response = `Interesante desafío el que planteas${name}.<br><br>`;
-            
-            response += `🔍 <strong>Análisis Rápido:</strong> Veo que tu consulta involucra los siguientes temas clave: <em>${analysis.keywords.join(', ')}</em>. Tiene una complejidad ${analysis.complexity} y un sentimiento general ${analysis.sentiment}.<br><br>`;
-            
-            response += `🗺️ <strong>Estructura de la Solución:</strong> Para darte la mejor respuesta, te propongo abordar esto en 3 pasos:<br>
-            1. <strong>Análisis Detallado:</strong> Profundizar en cada uno de los componentes de tu solicitud.<br>
-            2. <strong>Propuesta de Solución:</strong> Presentarte un plan de acción o una respuesta estructurada.<br>
-            3. <strong>Siguientes Pasos:</strong> Definir cómo podemos continuar y refinar la solución.<br><br>`;
-
-            response += `Para comenzar con el primer paso, ¿podrías darme un poco más de contexto sobre alguno de los temas que mencionaste? O si lo prefieres, puedo empezar con una solución general basada en la información que ya me diste.`;
-
-            return response;
-        }
-
-        function generateContextualResponse(message, analysis) {
-            const name = userProfile.name ? userProfile.name : 'tú';
-            const lastTopic = userProfile.previousTopics.length > 0 ? userProfile.previousTopics[userProfile.previousTopics.length - 1] : null;
-
-            if (lastTopic && Math.random() < 0.5) {
-                return `Interesante pregunta, ${name}. Por lo que recuerdo, hace poco hablamos sobre '${lastTopic}'. ¿Esto que me preguntas ahora se relaciona con ese tema?`;
+            if (analysis.sentiment === 'positive') {
+                return `¡Me alegra que te sientas así${name}! Es genial conversar contigo.`;
             }
 
-            const contextResponses = [
-                `Buena pregunta, ${name}. He notado un patrón en nuestras conversaciones que me permite ofrecerte una respuesta más personalizada.`,
-                `Basándome en tu estilo de comunicación y consultas anteriores, ${name}, puedo adaptar mi respuesta a tus necesidades específicas.`,
-                'Tu enfoque ' + analysis.sentiment + ' hacia este tema me ayuda a calibrar la mejor manera de asistirte.'
-            ];
-            return contextResponses[Math.floor(Math.random() * contextResponses.length)];
+            if (analysis.sentiment === 'negative') {
+                return `Lamento escuchar eso${name}. A veces las cosas no salen como esperamos, pero hablar de ello puede ayudar.`;
+            }
+
+            // Respuesta por defecto
+            return conversationalResponses[Math.floor(Math.random() * conversationalResponses.length)];
         }
 
         function generateCreatorResponse() {
@@ -702,70 +454,9 @@ Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
 🌐 Sitio web: <a href="https://az-innovation-x.vercel.app/" target="_blank">https://az-innovation-x.vercel.app/</a><br>
 📘 Facebook: <a href="https://www.facebook.com/AzInnovationX?mibextid=ZbWKwL" target="_blank">AzInnovationX en Facebook</a><br>
 🎵 TikTok: <a href="https://www.tiktok.com/@innovationx09?_t=ZS-8z7nlnJKq2C&_r=1" target="_blank">@innovationx09 en TikTok</a><br><br>
-Az InnovationX se dedica a crear experiencias digitales inteligentes y soluciones que realmente conectan con las personas. ¡Estoy orgulloso de ser parte de sus innovaciones!`;
+¡Me siento orgulloso de ser una de sus creaciones!`;
         }
-
-        function generateIDontKnowResponse() {
-            const name = userProfile.name ? `, ${userProfile.name}` : '';
-            const responses = [
-                `Esa es una pregunta muy interesante${name}. No estoy seguro de tener la respuesta correcta en mi base de conocimiento actual. ¿Podrías reformularla o darme un poco más de detalle?`,
-                `Hmm, eso me ha puesto a pensar. No tengo información específica sobre ese tema${name}. Agradezco que me ayudes a aprender. ¿Podemos intentar enfocarlo desde otro ángulo?`,
-                `Admito que no lo sé todo${name}. Sobre este tema en particular no tengo una respuesta. Sin embargo, puedo intentar buscar información relacionada si lo deseas.`
-            ];
-            return responses[Math.floor(Math.random() * responses.length)];
-        }
-
-        function personalizeResponse(response, sentiment) {
-            const name = userProfile.name ? `, ${userProfile.name}` : '';
-            if (sentiment === 'positive') {
-                response += `<br><br>🌟 Me alegra ver tu entusiasmo sobre este tema${name}. ¡Esa es la actitud para lograr grandes cosas!`;
-            } else if (sentiment === 'negative') {
-                response += `<br><br>🤝 Entiendo que esto puede ser frustrante${name}. No te preocupes, estoy aquí para ayudarte a superarlo. Trabajemos juntos para convertir estos obstáculos en oportunidades.`;
-            } else if (sentiment === 'neutral' && Math.random() < 0.3) { // Occasionally add a personal touch
-                response += `<br><br>Es un punto interesante${name}. Sigamos profundizando en ello.`;
-            }
-            return response;
-        }
-
-        function generateIntelligentSuggestions(analysis) {
-            let suggestions = '<br><br>💡 <strong>Sugerencias inteligentes para seguir avanzando:</strong><br>';
-            
-            if (analysis.urgency === 'high') {
-                suggestions += '⚡ Dado que esto es urgente, ¿te parece si priorizamos las acciones con mayor impacto inmediato?<br>';
-            }
-            
-            if (analysis.complexity === 'high') {
-                suggestions += '🧩 Para manejar mejor esta complejidad, podríamos desglosar el problema en fases más pequeñas. ¿Qué opinas?<br>';
-            }
-            
-            suggestions += '📚 ¿Prefieres que profundice en algún aspecto, te dé una explicación más técnica o busque ejemplos prácticos?';
-            
-            return suggestions;
-        }
-
-        function updateUserProfile(analysis) {
-            // Actualizar intereses
-            analysis.topics.forEach(topic => {
-                if (!userProfile.interests.includes(topic.category)) {
-                    userProfile.interests.push(topic.category);
-                }
-            });
-            
-            // Actualizar estado emocional
-            userProfile.emotionalState = analysis.sentiment;
-            
-            // Agregar temas previos
-            userProfile.previousTopics.push(...analysis.keywords);
-            
-            // Mantener solo los últimos 10 temas
-            userProfile.previousTopics = userProfile.previousTopics.slice(-10);
-        }
-
-        function setQuickMessage(message) {
-            document.getElementById('messageInput').value = message;
-            document.getElementById('messageInput').focus();
-        }
-
+        
         function adjustTextareaHeight() {
             const textarea = document.getElementById('messageInput');
             textarea.style.height = 'auto';
@@ -785,52 +476,36 @@ Az InnovationX se dedica a crear experiencias digitales inteligentes y solucione
             
             if (!message || isTyping) return;
 
-            // Agregar mensaje del usuario
             addMessage(message, 'user');
-            conversationHistory.push({type: 'user', content: message, timestamp: new Date()});
+            conversationHistory.push({type: 'user', content: message});
             
-            // Limpiar input
             input.value = '';
             input.style.height = 'auto';
             
-            // Mostrar indicador de escritura
             showTypingIndicator();
 
-            // --- INICIO: Lógica de captura de nombre ---
             if (!userProfile.nameKnown) {
                 userProfile.name = message;
                 userProfile.nameKnown = true;
 
                 setTimeout(() => {
                     hideTypingIndicator();
-                    const welcomeMessage = `¡Perfecto, ${userProfile.name}! Es un placer conocerte. Estoy aquí para ayudarte con cualquier pregunta, proyecto o desafío que tengas. <br><br>¿En qué puedo asistirte hoy?`;
+                    const welcomeMessage = `¡Perfecto, ${userProfile.name}! Es un placer conocerte. Ahora sí, podemos charlar de lo que quieras.`;
                     addMessage(welcomeMessage, 'bot');
-                    conversationHistory.push({type: 'bot', content: welcomeMessage, timestamp: new Date()});
+                    conversationHistory.push({type: 'bot', content: welcomeMessage});
                 }, 1500);
 
-                return; // Detener la ejecución normal
+                return;
             }
-            // --- FIN: Lógica de captura de nombre ---
             
-            // Analizar mensaje y generar respuesta
             setTimeout(() => {
                 const analysis = analyzeText(message);
-                const aiResponse = generateAdvancedResponse(message, analysis);
+                const botResponse = generateResponse(message, analysis);
                 
                 hideTypingIndicator();
-                
-                // Mostrar proceso de pensamiento
-                if (analysis.complexity === 'high' || analysis.intent === 'problem') {
-                    showThinkingProcess(aiResponse.thinkingProcess);
-                    setTimeout(() => {
-                        addMessage(aiResponse.response, 'bot');
-                        conversationHistory.push({type: 'bot', content: aiResponse.response, timestamp: new Date(), analysis: analysis});
-                    }, 1000);
-                } else {
-                    addMessage(aiResponse.response, 'bot');
-                    conversationHistory.push({type: 'bot', content: aiResponse.response, timestamp: new Date(), analysis: analysis});
-                }
-            }, 2000);
+                addMessage(botResponse, 'bot');
+                conversationHistory.push({type: 'bot', content: botResponse});
+            }, 1200);
         }
 
         function addMessage(content, type) {
@@ -852,32 +527,6 @@ Az InnovationX se dedica a crear experiencias digitales inteligentes y solucione
             
             container.appendChild(messageDiv);
             container.scrollTop = container.scrollHeight;
-        }
-
-        function showThinkingProcess(process) {
-            const container = document.getElementById('messagesContainer');
-            const thinkingDiv = document.createElement('div');
-            thinkingDiv.className = 'message bot';
-            thinkingDiv.id = 'thinkingProcess';
-            
-            thinkingDiv.innerHTML = 
-                '<div class="message-content">' +
-                    '<div class="message-avatar bot">🧠</div>' +
-                    '<div class="thinking-process">' +
-                        process +
-                    '</div>' +
-                '</div>';
-            
-            container.appendChild(thinkingDiv);
-            container.scrollTop = container.scrollHeight;
-            
-            // Remover después de mostrar la respuesta
-            setTimeout(() => {
-                const thinking = document.getElementById('thinkingProcess');
-                if (thinking) {
-                    thinking.remove();
-                }
-            }, 3000);
         }
 
         function showTypingIndicator() {
@@ -920,124 +569,7 @@ Az InnovationX se dedica a crear experiencias digitales inteligentes y solucione
             
             sendBtn.disabled = false;
         }
-
-        // Funciones adicionales para inteligencia avanzada
-        function getContextualInfo() {
-            const recentMessages = conversationHistory.slice(-5);
-            const recentTopics = recentMessages.flatMap(msg => 
-                msg.analysis ? msg.analysis.keywords : []
-            );
-            
-            return {
-                recentTopics: [...new Set(recentTopics)],
-                conversationLength: conversationHistory.length,
-                userMood: userProfile.emotionalState,
-                mainInterests: userProfile.interests
-            };
-        }
-
-        function adaptResponseStyle(analysis, context) {
-            let style = {
-                formality: 'professional',
-                detail: 'medium',
-                examples: true,
-                followUp: true
-            };
-            
-            // Adaptar según sentimiento
-            if (analysis.sentiment === 'negative') {
-                style.formality = 'empathetic';
-                style.detail = 'high';
-            }
-            
-            // Adaptar según complejidad
-            if (analysis.complexity === 'high') {
-                style.detail = 'high';
-                style.examples = true;
-            }
-            
-            // Adaptar según historial
-            if (context.conversationLength > 5) {
-                style.formality = 'friendly';
-                style.followUp = false;
-            }
-            
-            return style;
-        }
-
-        // Simulación de aprendizaje continuo
-        function learnFromInteraction(userMessage, botResponse, analysis) {
-            // Actualizar base de conocimientos basado en interacciones
-            if (analysis.topics.length > 0) {
-                analysis.topics.forEach(topic => {
-                    if (!userProfile.expertise.includes(topic.topic)) {
-                        userProfile.expertise.push(topic.topic);
-                    }
-                });
-            }
-            
-            // Detectar patrones de comunicación
-            if (userMessage.length > 100) {
-                userProfile.communicationStyle = 'detailed';
-            } else if (userMessage.length < 30) {
-                userProfile.communicationStyle = 'concise';
-            }
-            
-            console.log('📚 Asistente Inteligente aprendiendo de la interacción...', {
-                userStyle: userProfile.communicationStyle,
-                interests: userProfile.interests,
-                expertise: userProfile.expertise.slice(-3)
-            });
-        }
-
-        // Sistema de memoria mejorado
-        function rememberContext(message, analysis) {
-            const contextItem = {
-                message: message,
-                analysis: analysis,
-                timestamp: new Date(),
-                importance: calculateImportance(analysis)
-            };
-            
-            // Mantener solo contextos importantes
-            if (contextItem.importance > 0.5) {
-                conversationHistory.push(contextItem);
-                // Mantener solo los últimos 20 contextos
-                if (conversationHistory.length > 20) {
-                    conversationHistory = conversationHistory.slice(-20);
-                }
-            }
-        }
-
-        function calculateImportance(analysis) {
-            let importance = 0;
-            
-            if (analysis.intent === 'problem') importance += 0.3;
-            if (analysis.complexity === 'high') importance += 0.2;
-            if (analysis.urgency === 'high') importance += 0.3;
-            if (analysis.topics.length > 0) importance += 0.2;
-            
-            return importance;
-        }
-
-        // Personalización avanzada
-        function getPersonalizedGreeting() {
-            const greetings = [
-                '¡Hola de nuevo! Noto que has vuelto con más consultas interesantes.',
-                'Me alegra verte nuevamente. ¿En qué nuevo desafío puedo ayudarte?',
-                'Bienvenido otra vez. He estado procesando nuestras conversaciones anteriores.'
-            ];
-            
-            if (conversationHistory.length > 3) {
-                return greetings[Math.floor(Math.random() * greetings.length)];
-            }
-            
-            return '¡Hola! Soy tu Asistente Inteligente, listo para ayudarte con cualquier desafío.';
-        }
-
-        // Inicializar sistema inteligente
-        console.log('🚀 Asistente Inteligente - Sistema Avanzado Cargado');
-        console.log('💡 Capacidades: Análisis NLP, Memoria Contextual, Aprendizaje Adaptativo');
+        // --- Fin del script del Chatbot Amistoso ---
     </script>
 </body>
 </html>
