@@ -751,16 +751,11 @@
                 songs.push(...newSongs);
                 songIndex = 0; // Start from the beginning of the new list
                 
-                // Fade out, load the new song, and then play it
-                albumArt.classList.add('fade-out');
-                songInfo.classList.add('fade-out');
-                
-                setTimeout(() => {
-                    loadSong(songs[songIndex]);
-                    playSong();
-                    albumArt.classList.remove('fade-out');
-                    songInfo.classList.remove('fade-out');
-                }, 400);
+                // Add a one-time event listener to play the song when it's ready
+                audioPlayer.addEventListener('canplay', playSong, { once: true });
+
+                // Load the song, which will trigger the 'canplay' event
+                loadSong(songs[songIndex]);
 
             } else {
                 alert('No se encontraron archivos de música compatibles en la carpeta seleccionada.');
