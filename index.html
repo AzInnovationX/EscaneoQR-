@@ -345,7 +345,8 @@
                 <button class="send-btn" id="sendBtn">➤</button>
             </div>
             <div class="quick-actions">
-                <button id="addMusicBtn">🎶 Añadir</button>
+                <button id="addMusicBtn">🎶 Añadir Archivo</button>
+                <button id="scanMusicBtn">📁 Escanear Música</button>
                 <button id="quickPlayBtn">▶️ Reproducir</button>
                 <button id="quickPauseBtn">⏸️ Pausa</button>
                 <button id="quickNextBtn">⏭️ Siguiente</button>
@@ -372,6 +373,7 @@
         const quickPauseBtn = document.getElementById('quickPauseBtn');
         const quickNextBtn = document.getElementById('quickNextBtn');
         const addMusicBtn = document.getElementById('addMusicBtn');
+        const scanMusicBtn = document.getElementById('scanMusicBtn'); // New button
         const fileInput = document.getElementById('fileInput');
         const commandInput = document.getElementById('commandInput');
         const sendBtn = document.getElementById('sendBtn');
@@ -593,11 +595,66 @@
             commandInput.value = '';
         }
 
+        // --- Directory Scanner Functions ---
+        const supportedExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg'];
+
+        async function processDirectory(directoryHandle, newSongs) {
+            for await (const entry of directoryHandle.values()) {
+                if (entry.kind === 'file') {
+                    const isSupported = supportedExtensions.some(ext => entry.name.toLowerCase().endsWith(ext));
+                    if (isSupported) {
+                        const file = await entry.getFile();
+                        const newSong = {
+                            title: file.name.replace(/\.[^/.]+$/, ""),
+                            artist: 'Música Local',
+                            audioSrc: URL.createObjectURL(file),
+                            coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg' // Default cover
+                        };
+                        newSongs.push(newSong);
+                    }
+                } else if (entry.kind === 'directory') {
+                    await processDirectory(entry, newSongs);
+                }
+            }
+        }
+
+        async function scanDirectoryForMusic() {
+            if (!('showDirectoryPicker' in window)) {
+                alert('Tu navegador no soporta la API de Acceso al Sistema de Archivos. Prueba con Chrome o Edge.');
+                return;
+            }
+
+            try {
+                const directoryHandle = await window.showDirectoryPicker();
+                const newSongs = [];
+                const initialSongCount = songs.length;
+                await processDirectory(directoryHandle, newSongs);
+                
+                if (newSongs.length > 0) {
+                    songs.push(...newSongs);
+                    songIndex = initialSongCount; // Set index to the first new song
+                    loadSong(songs[songIndex]);
+                    alert(`¡Éxito! Se añadieron ${newSongs.length} canciones a tu lista.`);
+                } else {
+                    alert('No se encontraron archivos de música compatibles en la carpeta seleccionada.');
+                }
+
+            } catch (err) {
+                // Handle cases where the user closes the picker
+                if (err.name === 'AbortError') {
+                    console.log('El usuario cerró el selector de directorio.');
+                } else {
+                    console.error('Error al seleccionar el directorio:', err);
+                }
+            }
+        }
+
         // --- Event Listeners ---
         playPauseBtn.addEventListener('click', () => {
             isPlaying ? pauseSong() : playSong();
         });
         prevBtn.addEventListener('click', prevSong);
+        scanMusicBtn.addEventListener('click', scanDirectoryForMusic);
         nextBtn.addEventListener('click', nextSong);
         audioPlayer.addEventListener('ended', nextSong);
         audioPlayer.addEventListener('timeupdate', updateProgressBar);
