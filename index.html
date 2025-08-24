@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Amistoso</title>
     <title>Santiplay</title>
     <style>
         * {
@@ -16,15 +17,15 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
+            flex-direction: column;
         }
 
-        .app-container {
+        .chat-container {
+            max-width: 1400px;
+            margin: 0 auto;
             width: 100%;
-            max-width: 400px;
-            background: rgba(255,255,255,0.98);
+            height: 100vh;
+            background: rgba(255,255,255,0.95);
             backdrop-filter: blur(20px);
             box-shadow: 0 25px 50px rgba(0,0,0,0.25);
             display: flex;
@@ -37,19 +38,59 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 25px;
             color: white;
-            text-align: center;
             position: relative;
-            overflow: hidden; /* To contain the canvas */
+            overflow: hidden;
         }
 
-        .header-text {
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
             position: relative;
-            z-index: 1;
+            z-index: 2;
+        }
+
+        .bot-avatar {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: -3px;
+            right: -3px;
+            width: 20px;
+            height: 20px;
+            background: #10b981;
+            border: 4px solid white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         .header-text h1 {
             font-size: 28px;
-            font-weight: 900;
+            font-weight: 800;
             margin-bottom: 5px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
@@ -57,32 +98,170 @@
         .header-text p {
             font-size: 16px;
             opacity: 0.9;
-            font-weight: 600;
+            font-weight: 500;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 25px;
+            background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            padding-bottom: 150px; /* Space for music player */
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 25px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            max-width: 75%;
+        }
+
+        .message.user .message-content {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .message-avatar.bot {
+            background: linear-gradient(135deg, #ff6b6b, #ffd93d);
+            color: white;
+        }
+
+        .message-avatar.user {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .message-bubble {
+            padding: 20px 25px;
+            border-radius: 25px;
+            font-size: 16px;
+            line-height: 1.6;
+            position: relative;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .message-bubble.bot {
+            background: white;
+            color: #374151;
+            border-bottom-left-radius: 8px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .message-bubble.user {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom-right-radius: 8px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            margin-top: 10px;
+            opacity: 0.7;
+            font-weight: 500;
+        }
+
+        .typing-indicator {
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 25px;
+        }
+
+        .typing-content {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            max-width: 75%;
+        }
+
+        .typing-bubble {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            border-bottom-left-radius: 8px;
+            padding: 20px 25px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 8px;
+        }
+
+        .typing-dot {
+            width: 10px;
+            height: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
         }
 
         .input-area {
             background: white;
-            border-top: 1px solid #e2e8f0;
-            padding: 20px;
+            border-top: 2px solid #e2e8f0;
+            padding: 25px;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
         }
 
         .input-container {
             display: flex;
-            gap: 10px;
+            align-items: flex-end;
+            gap: 20px;
         }
 
-        #commandInput {
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        #messageInput {
             width: 100%;
-            padding: 14px 20px;
+            padding: 18px 25px;
             border: 2px solid #e2e8f0;
-            border-radius: 25px;
+            border-radius: 30px;
             font-size: 16px;
             font-family: inherit;
+            resize: none;
+            max-height: 150px;
+            min-height: 55px;
             transition: all 0.3s ease;
             background: #f8fafc;
         }
 
-        #commandInput:focus {
+        #messageInput:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
@@ -90,10 +269,9 @@
         }
 
         .send-btn {
-            flex-shrink: 0;
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             color: white;
             border: none;
             border-radius: 50%;
@@ -101,31 +279,36 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 22px;
             transition: all 0.3s ease;
             box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
 
-        .send-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.1) translateY(-2px);
+            box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .quick-actions {
             display: flex;
             justify-content: center;
-            gap: 10px;
+            gap: 15px;
             margin-top: 15px;
-            flex-wrap: wrap;
         }
 
         .quick-actions button {
             background-color: #f1f5f9;
             border: 1px solid #e2e8f0;
             border-radius: 20px;
-            padding: 8px 16px;
+            padding: 10px 20px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 500;
             color: #4b5563;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -137,54 +320,88 @@
         .quick-actions button:hover {
             background-color: #e2e8f0;
             border-color: #cbd5e1;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .message-content {
+                max-width: 90%;
+            }
+            .chat-container {
+                border-radius: 0;
+            }
+            .music-player {
+                flex-direction: column;
+                padding: 15px;
+                align-items: stretch;
+            }
+            .song-info {
+                text-align: center;
+                margin: 10px 0;
+            }
+            .album-art {
+                width: 100px;
+                height: 100px;
+                margin: 0 auto;
+            }
+            .controls {
+                justify-content: center;
+            }
+            .quick-actions {
+                flex-wrap: wrap;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        .messages-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .messages-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+        }
+
+        .messages-container::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
         }
 
         /* --- Music Player Styles --- */
         .music-player {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 30px;
-            position: relative;
-            background-image: url('https://i.ibb.co/8nPwzrQW/a0445440d2fa611f0fdb7562c36322d5.gif');
-            background-size: cover;
-            background-position: center;
-        }
-
-        .music-player::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
+            position: fixed;
             bottom: 0;
             left: 0;
-            background-color: rgba(0, 0, 0, 0.5); /* Black overlay for better text contrast */
-        }
-
-        #visualizer {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            z-index: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid #e2e8f0;
+            padding: 15px 25px;
+            display: none; /* Hidden by default */
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.5s ease-in-out;
         }
 
-        .album-art, .song-info, .controls {
-            position: relative; /* Ensure content is above the overlay */
-            z-index: 1;
+        .music-player.visible {
+            display: flex;
+            transform: translateY(0);
         }
 
         .album-art {
-            width: 200px;
-            height: 200px;
-            border-radius: 15px;
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 15px 40px -10px rgba(0,0,0,0.4);
-            margin-bottom: 25px;
-            transition: opacity 0.4s ease-in-out;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            flex-shrink: 0;
         }
 
         .album-art img {
@@ -193,89 +410,42 @@
             object-fit: cover;
         }
 
-        .album-art.rotating {
-            animation: rotate 30s linear infinite;
-        }
-
-        .album-art.fade-out, .song-info.fade-out {
-            opacity: 0;
-        }
-
-        @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
         .song-info {
-            text-align: center;
-            margin-bottom: 20px;
-            transition: opacity 0.4s ease-in-out;
+            flex-grow: 1;
+            text-align: left;
+            min-width: 0;
         }
 
         .song-info h3 {
-            font-size: 24px;
-            font-weight: 800;
-            color: #ffffff; /* Change text to white for contrast */
-            margin: 0 0 8px;
-            text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .song-info p {
-            font-size: 16px;
-            color: #e0e0e0; /* Change text to light gray */
-            margin: 0;
-            text-shadow: 0 1px 5px rgba(0,0,0,0.5);
-            font-weight: 500;
-        }
-
-        .progress-details {
-            width: 85%;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .progress-container {
-            background: rgba(255,255,255,0.2);
-            border-radius: 5px;
-            cursor: pointer;
-            height: 8px;
-            width: 100%;
-        }
-
-        .progress-bar {
-            background: #ffffff;
-            border-radius: 5px;
-            height: 100%;
-            width: 0%; /* Initial width */
-            transition: width 0.1s linear;
-        }
-
-        .time-stamps {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            margin-top: 5px;
             font-size: 14px;
-            color: #e0e0e0;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            color: #6b7280;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .controls {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 15px;
         }
 
         .controls button {
-            background: rgba(255,255,255,0.2);
+            background: transparent;
             border: none;
-            font-size: 28px;
-            color: #ffffff;
+            font-size: 22px;
+            color: #4b5563;
             cursor: pointer;
             transition: all 0.2s ease;
             padding: 10px;
@@ -283,71 +453,76 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 60px;
-            height: 60px;
+            width: 44px;
+            height: 44px;
         }
 
         .controls button:hover:not(:disabled) {
-            background: rgba(255,255,255,0.4);
-            transform: scale(1.1);
+            color: #667eea;
+            background: #f1f5f9;
         }
 
         #playPauseBtn {
-            font-size: 40px;
-            color: #ffffff;
-            width: 70px;
-            height: 70px;
-            background: rgba(255,255,255,0.3);
+            font-size: 28px;
+            color: #667eea;
+            width: 54px;
+            height: 54px;
+        }
+
+        .controls button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
+    <div class="chat-container">
+        <!-- Header -->
         <div class="header">
-            <canvas id="visualizer"></canvas>
-            <div class="header-text">
-                <h1>Santiplay</h1>
-                <p>Escribe un comando o usa los botones</p>
+            <div class="header-content">
+                <div class="bot-avatar">
+                    🧠
+                    <div class="status-indicator"></div>
+                </div>
+                <div class="header-text">
+                    <h1>Chatbot Amistoso</h1>
+                    <h1>Santiplay</h1>
+                    <p>¡Hola! Estoy aquí para charlar contigo.</p>
+                </div>
             </div>
         </div>
 
-        <div class="music-player" id="musicPlayer">
-            <div class="album-art">
-                <img src="https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg" alt="Album Art" id="albumArt">
-            </div>
-            <div class="song-info">
-                <h3 id="songTitle">Título de la Canción</h3>
-                <p id="songArtist">Nombre del Artista</p>
-            </div>
-            <div class="progress-details">
-                <div class="progress-container" id="progressContainer">
-                    <div class="progress-bar" id="progressBar"></div>
+        <!-- Messages -->
+        <div class="messages-container" id="messagesContainer">
+            <div class="message bot">
+                <div class="message-content">
+                    <div class="message-avatar bot">🧠</div>
+                    <div class="message-bubble bot">
+                        <div>
+                            ¡Hola! Me da gusto conocerte. <br><br>Para empezar, ¿cómo te llamas?
+                        </div>
+                        <div class="message-time" id="initialTime"></div>
+                    </div>
                 </div>
-                <div class="time-stamps">
-                    <span id="currentTime">0:00</span>
-                    <span id="totalDuration">0:00</span>
-                </div>
-            </div>
-            <div class="controls">
-                <button id="prevBtn">⏮</button>
-                <button id="playPauseBtn">▶️</button>
-                <button id="nextBtn">⏭</button>
             </div>
         </div>
 
+        <!-- Input Area -->
         <div class="input-area">
             <div class="input-container">
-                <input 
-                    type="text"
-                    id="commandInput" 
-                    placeholder="Comando: play, pausa, siguiente..."
-                />
-                <button class="send-btn" id="sendBtn">➤</button>
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        placeholder="Escribe tu mensaje..."
+                        onkeypress="handleKeyPress(event)"
+                        oninput="adjustTextareaHeight()"
+                    ></textarea>
+                </div>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    ➤
+                </button>
             </div>
             <div class="quick-actions">
-                <button id="addMusicBtn">🎶 Añadir</button>
-                <button id="addMusicBtn">🎶 Añadir Archivo</button>
-                <button id="scanMusicBtn">📁 Escanear Música</button>
                 <button id="quickPlayBtn">▶️ Reproducir</button>
                 <button id="quickPauseBtn">⏸️ Pausa</button>
                 <button id="quickNextBtn">⏭️ Siguiente</button>
@@ -355,16 +530,269 @@
         </div>
     </div>
 
+    <!-- Music Player -->
+    <div class="music-player" id="musicPlayer">
+        <div class="album-art">
+            <img src="https://i.scdn.co/image/ab67616d0000b2734e5df11b166c33f4078b485a" alt="Album Art" id="albumArt">
+        </div>
+        <div class="song-info">
+            <h3 id="songTitle">Título de la Canción</h3>
+            <p id="songArtist">Nombre del Artista</p>
+        </div>
+        <div class="controls">
+            <button id="prevBtn">⏮</button>
+            <button id="playPauseBtn">▶️</button>
+            <button id="nextBtn">⏭</button>
+        </div>
+    </div>
+
     <audio id="audioPlayer"></audio>
-    <input type="file" id="fileInput" accept="audio/*" style="display: none;" multiple>
 
     <script>
+        // --- Comienzo del script del Chatbot Amistoso ---
         // --- Comienzo del script de Santiplay ---
+        let isTyping = false;
+        let userProfile = {
+            name: null,
+            nameKnown: false,
+        };
+        let conversationHistory = [];
 
-        // --- DOM Elements ---
+        const conversationalResponses = [
+            "¡Qué interesante! Cuéntame más.",
+            "Eso suena fascinante. ¿Y qué más?",
+            "Entiendo. ¿Hay algo más en lo que pienses?",
+            "Gracias por compartir. ¿Qué más te gustaría conversar?",
+            "Me parece un buen punto. Sigamos charlando.",
+            "Es una perspectiva muy válida.",
+            "Disfruto mucho esta conversación contigo.",
+            "Haces que pensar sea muy entretenido."
+        ];
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('initialTime').textContent = new Date().toLocaleTimeString();
+            console.log('🧠 Chatbot Amistoso inicializado.');
+            console.log('🧠 Santiplay inicializado.');
+        });
+
+        // Análisis de texto simplificado
+        function analyzeText(text) {
+            return {
+                sentiment: analyzeSentiment(text),
+                isCreatorQuery: detectCreatorQuery(text),
+                musicCommand: detectMusicQuery(text)
+            };
+        }
+
+        function analyzeSentiment(text) {
+            const positiveWords = ['excelente', 'bueno', 'perfecto', 'genial', 'increible', 'fantastico', 'amor', 'feliz', 'sí', 'gracias'];
+            const negativeWords = ['malo', 'terrible', 'odio', 'problema', 'dificil', 'frustrado', 'imposible', 'no'];
+
+            let score = 0;
+            const words = text.toLowerCase().split(' ');
+
+            words.forEach(word => {
+                if (positiveWords.includes(word)) score += 1;
+                if (negativeWords.includes(word)) score -= 1;
+            });
+
+            if (score > 0) return 'positive';
+            if (score < 0) return 'negative';
+            return 'neutral';
+        }
+
+        function detectCreatorQuery(text) {
+            const creatorWords = ['creador', 'creó', 'hizo', 'empresa', 'programador', 'desarrollador', 'innovationx', 'az innovationx'];
+            return creatorWords.some(word => text.toLowerCase().includes(word));
+        }
+
+        function detectMusicQuery(text) {
+            const lowerCaseText = text.toLowerCase();
+            const playKeywords = ['reproduce', 'pon', 'play', 'dale', 'suena', 'música', 'canción'];
+            const pauseKeywords = ['pausa', 'para', 'stop', 'deten'];
+            const nextKeywords = ['siguiente', 'otra', 'next', 'skip'];
+            const prevKeywords = ['anterior', 'previa', 'regresa', 'previous'];
+
+            if (playKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'play' };
+            }
+            if (pauseKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'pause' };
+            }
+            if (nextKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'next' };
+            }
+            if (prevKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'prev' };
+            }
+            return { command: null };
+        }
+
+        // Generador de respuestas conversacionales
+        function generateResponse(userMessage, analysis) {
+            if (analysis.musicCommand.command) {
+                switch (analysis.musicCommand.command) {
+                    case 'play':
+                        playSong();
+                        return `¡Claro! Reproduciendo: ${songs[songIndex].title}`;
+                    case 'pause':
+                        pauseSong();
+                        return 'Música en pausa.';
+                    case 'next':
+                        nextSong();
+                        return `Ok, siguiente canción: ${songs[songIndex].title}`;
+                    case 'prev':
+                        prevSong();
+                        return `Volviendo a la anterior: ${songs[songIndex].title}`;
+                }
+            }
+
+            if (analysis.isCreatorQuery) {
+                return generateCreatorResponse();
+            }
+
+            const name = userProfile.name ? `, ${userProfile.name}` : '';
+
+            if (analysis.sentiment === 'positive') {
+                return `¡Me alegra que te sientas así${name}! Es genial conversar contigo.`;
+            }
+
+            if (analysis.sentiment === 'negative') {
+                return `Lamento escuchar eso${name}. A veces las cosas no salen como esperamos, pero hablar de ello puede ayudar.`;
+            }
+
+            // Respuesta por defecto
+            return conversationalResponses[Math.floor(Math.random() * conversationalResponses.length)];
+        }
+
+        function generateCreatorResponse() {
+            return `Fui creado por Az InnovationX, una empresa innovadora especializada en soluciones tecnológicas avanzadas.<br>
+Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
+🌐 Sitio web: <a href="https://az-innovation-x.vercel.app/" target="_blank">https://az-innovation-x.vercel.app/</a><br>
+📘 Facebook: <a href="https://www.facebook.com/AzInnovationX" target="_blank">AzInnovationX en Facebook</a><br>
+🎵 TikTok: <a href="https://www.tiktok.com/@innovationx09" target="_blank">@innovationx09 en TikTok</a><br><br>
+¡Me siento orgulloso de ser una de sus creaciones!`;
+        }
+
+        function adjustTextareaHeight() {
+            const textarea = document.getElementById('messageInput');
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+
+            if (!message || isTyping) return;
+
+            addMessage(message, 'user');
+            conversationHistory.push({type: 'user', content: message});
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            showTypingIndicator();
+
+            if (!userProfile.nameKnown) {
+                userProfile.name = message;
+                userProfile.nameKnown = true;
+
+                setTimeout(() => {
+                    hideTypingIndicator();
+                    const welcomeMessage = `¡Perfecto, ${userProfile.name}! Es un placer conocerte. Ahora sí, podemos charlar de lo que quieras.`;
+                    addMessage(welcomeMessage, 'bot');
+                    conversationHistory.push({type: 'bot', content: welcomeMessage});
+                }, 1500);
+
+                return;
+            }
+
+            setTimeout(() => {
+                const analysis = analyzeText(message);
+                const botResponse = generateResponse(message, analysis);
+
+                hideTypingIndicator();
+                addMessage(botResponse, 'bot');
+                conversationHistory.push({type: 'bot', content: botResponse});
+            }, 1200);
+        }
+
+        function addMessage(content, type) {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message ' + type;
+
+            const time = new Date().toLocaleTimeString();
+            const avatar = type === 'bot' ? '🧠' : '👤';
+
+            messageDiv.innerHTML = 
+                '<div class="message-content">' +
+                    '<div class="message-avatar ' + type + '">' + avatar + '</div>' +
+                    '<div class="message-bubble ' + type + '">' +
+                        '<div>' + content + '</div>' +
+                        '<div class="message-time">' + time + '</div>' +
+                    '</div>' +
+                '</div>';
+
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            if (isTyping) return;
+
+            isTyping = true;
+            const container = document.getElementById('messagesContainer');
+            const sendBtn = document.getElementById('sendBtn');
+
+            sendBtn.disabled = true;
+
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.id = 'typingIndicator';
+
+            typingDiv.innerHTML = 
+                '<div class="typing-content">' +
+                    '<div class="message-avatar bot">🧠</div>' +
+                    '<div class="typing-bubble">' +
+                        '<div class="typing-dots">' +
+                            '<div class="typing-dot"></div>' +
+                            '<div class="typing-dot"></div>' +
+                            '<div class="typing-dot"></div>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+
+            container.appendChild(typingDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            isTyping = false;
+            const typingIndicator = document.getElementById('typingIndicator');
+            const sendBtn = document.getElementById('sendBtn');
+
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+
+            sendBtn.disabled = false;
+        }
+
+        // --- Comienzo del script del Reproductor de Música ---
+
+        const musicPlayer = document.getElementById('musicPlayer');
         const audioPlayer = document.getElementById('audioPlayer');
         const albumArt = document.getElementById('albumArt');
-        const songInfo = document.querySelector('.song-info');
         const songTitle = document.getElementById('songTitle');
         const songArtist = document.getElementById('songArtist');
         const prevBtn = document.getElementById('prevBtn');
@@ -373,19 +801,7 @@
         const quickPlayBtn = document.getElementById('quickPlayBtn');
         const quickPauseBtn = document.getElementById('quickPauseBtn');
         const quickNextBtn = document.getElementById('quickNextBtn');
-        const addMusicBtn = document.getElementById('addMusicBtn');
-        const scanMusicBtn = document.getElementById('scanMusicBtn'); // New button
-        const fileInput = document.getElementById('fileInput');
-        const commandInput = document.getElementById('commandInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const currentTimeEl = document.getElementById('currentTime');
-        const totalDurationEl = document.getElementById('totalDuration');
-        const visualizer = document.getElementById('visualizer');
-        const visualizerCtx = visualizer.getContext('2d');
 
-        // --- Music Library ---
         const songs = [
             {
                 title: 'Mortals (feat. Laura Brehm)',
@@ -407,52 +823,9 @@
             }
         ];
 
-        // --- Player State ---
         let songIndex = 0;
         let isPlaying = false;
-        let audioCtx;
-        let analyser;
 
-        // --- Web Audio API Setup ---
-        function initAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                const source = audioCtx.createMediaElementSource(audioPlayer);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-                analyser.fftSize = 128;
-                drawVisualizer(); 
-            }
-        }
-
-        function drawVisualizer() {
-            requestAnimationFrame(drawVisualizer);
-
-            if (!analyser) return;
-
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyser.getByteFrequencyData(dataArray);
-
-            visualizerCtx.clearRect(0, 0, visualizer.width, visualizer.height);
-
-            const barWidth = (visualizer.width / bufferLength);
-            let barHeight;
-            let x = 0;
-
-            for (let i = 0; i < bufferLength; i++) {
-                barHeight = dataArray[i] / 3;
-
-                const opacity = barHeight / 200; // Make it more subtle
-                visualizerCtx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-                visualizerCtx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
-
-                x += barWidth;
-            }
-        }
-
-        // --- Core Player Functions ---
         function loadSong(song) {
             songTitle.textContent = song.title;
             songArtist.textContent = song.artist;
@@ -460,244 +833,62 @@
             albumArt.src = song.coverSrc;
         }
 
-
         function playSong() {
-            initAudioContext();
             isPlaying = true;
-            albumArt.classList.add('rotating');
             playPauseBtn.textContent = '⏸️';
+            musicPlayer.classList.add('visible');
             audioPlayer.play();
         }
 
         function pauseSong() {
             isPlaying = false;
-            albumArt.classList.remove('rotating');
             playPauseBtn.textContent = '▶️';
             audioPlayer.pause();
         }
 
         function prevSong() {
-            songIndex = (songIndex - 1 + songs.length) % songs.length;
-
-            albumArt.classList.add('fade-out');
-            songInfo.classList.add('fade-out');
-
-            setTimeout(() => {
-                loadSong(songs[songIndex]);
-                playSong();
-                albumArt.classList.remove('fade-out');
-                songInfo.classList.remove('fade-out');
-            }, 400);
+            songIndex--;
+            if (songIndex < 0) {
+                songIndex = songs.length - 1;
+            }
+            loadSong(songs[songIndex]);
+            playSong();
         }
 
         function nextSong() {
-            songIndex = (songIndex + 1) % songs.length;
-
-            albumArt.classList.add('fade-out');
-            songInfo.classList.add('fade-out');
-
-            setTimeout(() => {
-                loadSong(songs[songIndex]);
-                playSong();
-                albumArt.classList.remove('fade-out');
-                songInfo.classList.remove('fade-out');
-            }, 400);
-        }
-
-        // --- Progress Bar & Time Functions ---
-        function updateProgressBar(e) {
-            const { duration, currentTime } = e.srcElement;
-            if (duration) {
-                const progressPercent = (currentTime / duration) * 100;
-                progressBar.style.width = `${progressPercent}%`;
-                totalDurationEl.textContent = formatTime(duration);
+            songIndex++;
+            if (songIndex > songs.length - 1) {
+                songIndex = 0;
             }
-            currentTimeEl.textContent = formatTime(currentTime);
+            loadSong(songs[songIndex]);
+            playSong();
         }
 
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return '0:00';
-            const minutes = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
-            return `${minutes}:${secs}`;
-        }
-
-        function setProgressBar(e) {
-            const width = this.clientWidth;
-            const clickX = e.offsetX;
-            const { duration } = audioPlayer;
-            if (duration) {
-                audioPlayer.currentTime = (clickX / width) * duration;
-            }
-        }
-
-        // --- Command Processing ---
-        function detectMusicQuery(text) {
-            const lowerCaseText = text.toLowerCase();
-            // Removed generic words like 'música', 'canción' to avoid conflicts with search.
-            const playKeywords = ['reproduce', 'pon', 'play', 'dale', 'suena'];
-            const pauseKeywords = ['pausa', 'para', 'stop', 'deten'];
-            const nextKeywords = ['siguiente', 'otra', 'next', 'skip'];
-            const prevKeywords = ['anterior', 'previa', 'regresa', 'previous'];
-
-            if (playKeywords.some(word => lowerCaseText.includes(word))) return { command: 'play' };
-            if (pauseKeywords.some(word => lowerCaseText.includes(word))) return { command: 'pause' };
-            if (nextKeywords.some(word => lowerCaseText.includes(word))) return { command: 'next' };
-            if (prevKeywords.some(word => lowerCaseText.includes(word))) return { command: 'prev' };
-            return { command: null };
-        }
-
-        function processCommand() {
-            const commandText = commandInput.value.trim();
-            if (!commandText) return;
-
-            const lowerCaseText = commandText.toLowerCase();
-
-            // 1. Prioritize searching for a song by title
-            const foundSongIndex = songs.findIndex(song => song.title.toLowerCase().includes(lowerCaseText));
-
-            if (foundSongIndex !== -1) {
-                songIndex = foundSongIndex;
-
-                albumArt.classList.add('fade-out');
-                songInfo.classList.add('fade-out');
-
-                setTimeout(() => {
-                    loadSong(songs[songIndex]);
-                    playSong();
-                    albumArt.classList.remove('fade-out');
-                    songInfo.classList.remove('fade-out');
-                }, 400);
-
-                commandInput.value = '';
-                return; // Exit after finding and playing the song
-            }
-
-            // 2. If no song is found, process as a command
-            const analysis = detectMusicQuery(commandText);
-
-            if (analysis.command) {
-                switch (analysis.command) {
-                    case 'play':
-                        playSong();
-                        break;
-                    case 'pause':
-                        pauseSong();
-                        break;
-                    case 'next':
-                        nextSong();
-                        break;
-                    case 'prev':
-                        prevSong();
-                        break;
-                }
-            }
-
-            commandInput.value = '';
-        }
-
-        // --- Directory Scanner Functions ---
-        const supportedExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg'];
-
-        async function processDirectory(directoryHandle, newSongs) {
-            for await (const entry of directoryHandle.values()) {
-                if (entry.kind === 'file') {
-                    const isSupported = supportedExtensions.some(ext => entry.name.toLowerCase().endsWith(ext));
-                    if (isSupported) {
-                        const file = await entry.getFile();
-                        const newSong = {
-                            title: file.name.replace(/\.[^/.]+$/, ""),
-                            artist: 'Música Local',
-                            audioSrc: URL.createObjectURL(file),
-                            coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg' // Default cover
-                        };
-                        newSongs.push(newSong);
-                    }
-                } else if (entry.kind === 'directory') {
-                    await processDirectory(entry, newSongs);
-                }
-            }
-        }
-
-        async function scanDirectoryForMusic() {
-            if (!('showDirectoryPicker' in window)) {
-                alert('Tu navegador no soporta la API de Acceso al Sistema de Archivos. Prueba con Chrome o Edge.');
-                return;
-            }
-
-            try {
-                const directoryHandle = await window.showDirectoryPicker();
-                const newSongs = [];
-                const initialSongCount = songs.length;
-                await processDirectory(directoryHandle, newSongs);
-                
-                if (newSongs.length > 0) {
-                    songs.push(...newSongs);
-                    songIndex = initialSongCount; // Set index to the first new song
-                    loadSong(songs[songIndex]);
-                    alert(`¡Éxito! Se añadieron ${newSongs.length} canciones a tu lista.`);
-                } else {
-                    alert('No se encontraron archivos de música compatibles en la carpeta seleccionada.');
-                }
-
-            } catch (err) {
-                // Handle cases where the user closes the picker
-                if (err.name === 'AbortError') {
-                    console.log('El usuario cerró el selector de directorio.');
-                } else {
-                    console.error('Error al seleccionar el directorio:', err);
-                }
-            }
-        }
-
-        // --- Event Listeners ---
         playPauseBtn.addEventListener('click', () => {
-            isPlaying ? pauseSong() : playSong();
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
         });
+
         prevBtn.addEventListener('click', prevSong);
-        scanMusicBtn.addEventListener('click', scanDirectoryForMusic);
         nextBtn.addEventListener('click', nextSong);
         audioPlayer.addEventListener('ended', nextSong);
-        audioPlayer.addEventListener('timeupdate', updateProgressBar);
-        audioPlayer.addEventListener('loadedmetadata', updateProgressBar);
-        progressContainer.addEventListener('click', setProgressBar);
+
         quickPlayBtn.addEventListener('click', playSong);
         quickPauseBtn.addEventListener('click', pauseSong);
         quickNextBtn.addEventListener('click', nextSong);
-        sendBtn.addEventListener('click', processCommand);
-        commandInput.addEventListener('keypress', (event) => {
-            if (event.key === 'Enter') {
-                processCommand();
-            }
-        });
-        addMusicBtn.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            if (!files.length) return;
 
-            // Add all selected files to the songs array
-            for (const file of files) {
-                const newSong = {
-                    title: file.name.replace(/\.[^/.]+$/, ""),
-                    artist: 'Archivo Local',
-                    audioSrc: URL.createObjectURL(file),
-                    coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg' // Default cover
-                };
-                songs.push(newSong);
-            }
-
-            // Load and play the first of the newly added songs
-            songIndex = songs.length - files.length;
-            audioPlayer.addEventListener('canplay', playSong, { once: true });
+        // Cargar la primera canción al inicio pero no reproducir.
+        document.addEventListener('DOMContentLoaded', () => {
             loadSong(songs[songIndex]);
         });
 
-        // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded',_ => {
-            loadSong(songs[songIndex]);
-            console.log('🧠 Santiplay inicializado.');
-        });
+        // --- Fin del script del Reproductor de Música ---
 
+        // --- Fin del script del Chatbot Amistoso ---
+        // --- Fin del script de Santiplay ---
     </script>
 </body>
 </html>
