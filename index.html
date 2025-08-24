@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot Amistoso</title>
+    <title>Santiplay</title>
     <style>
         * {
             margin: 0;
@@ -294,6 +294,33 @@
             transform: none;
         }
 
+        .quick-actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .quick-actions button {
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quick-actions button:hover {
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .message-content {
@@ -318,6 +345,9 @@
             }
             .controls {
                 justify-content: center;
+            }
+            .quick-actions {
+                flex-wrap: wrap;
             }
         }
 
@@ -454,7 +484,7 @@
                     <div class="status-indicator"></div>
                 </div>
                 <div class="header-text">
-                    <h1>Chatbot Amistoso</h1>
+                    <h1>Santiplay</h1>
                     <p>¡Hola! Estoy aquí para charlar contigo.</p>
                 </div>
             </div>
@@ -490,6 +520,11 @@
                     ➤
                 </button>
             </div>
+            <div class="quick-actions">
+                <button id="quickPlayBtn">▶️ Reproducir</button>
+                <button id="quickPauseBtn">⏸️ Pausa</button>
+                <button id="quickNextBtn">⏭️ Siguiente</button>
+            </div>
         </div>
     </div>
     
@@ -512,7 +547,7 @@
     <audio id="audioPlayer"></audio>
 
     <script>
-        // --- Comienzo del script del Chatbot Amistoso ---
+        // --- Comienzo del script de Santiplay ---
         let isTyping = false;
         let userProfile = {
             name: null,
@@ -534,7 +569,7 @@
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('initialTime').textContent = new Date().toLocaleTimeString();
-            console.log('🧠 Chatbot Amistoso inicializado.');
+            console.log('🧠 Santiplay inicializado.');
         });
 
         // Análisis de texto simplificado
@@ -759,6 +794,9 @@ Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
         const prevBtn = document.getElementById('prevBtn');
         const playPauseBtn = document.getElementById('playPauseBtn');
         const nextBtn = document.getElementById('nextBtn');
+        const quickPlayBtn = document.getElementById('quickPlayBtn');
+        const quickPauseBtn = document.getElementById('quickPauseBtn');
+        const quickNextBtn = document.getElementById('quickNextBtn');
 
         const songs = [
             {
@@ -834,6 +872,10 @@ Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
         nextBtn.addEventListener('click', nextSong);
         audioPlayer.addEventListener('ended', nextSong);
 
+        quickPlayBtn.addEventListener('click', playSong);
+        quickPauseBtn.addEventListener('click', pauseSong);
+        quickNextBtn.addEventListener('click', nextSong);
+
         // Cargar la primera canción al inicio pero no reproducir.
         document.addEventListener('DOMContentLoaded', () => {
             loadSong(songs[songIndex]);
@@ -841,7 +883,7 @@ Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
         
         // --- Fin del script del Reproductor de Música ---
 
-        // --- Fin del script del Chatbot Amistoso ---
+        // --- Fin del script de Santiplay ---
     </script>
 </body>
 </html>
