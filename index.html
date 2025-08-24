@@ -105,6 +105,7 @@
             overflow-y: auto;
             padding: 25px;
             background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+            padding-bottom: 150px; /* Space for music player */
         }
 
         .message {
@@ -301,6 +302,23 @@
             .chat-container {
                 border-radius: 0;
             }
+            .music-player {
+                flex-direction: column;
+                padding: 15px;
+                align-items: stretch;
+            }
+            .song-info {
+                text-align: center;
+                margin: 10px 0;
+            }
+            .album-art {
+                width: 100px;
+                height: 100px;
+                margin: 0 auto;
+            }
+            .controls {
+                justify-content: center;
+            }
         }
 
         /* Scrollbar personalizada */
@@ -320,6 +338,109 @@
 
         .messages-container::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+        
+        /* --- Music Player Styles --- */
+        .music-player {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid #e2e8f0;
+            padding: 15px 25px;
+            display: none; /* Hidden by default */
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.15);
+            z-index: 1000;
+            transform: translateY(100%);
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .music-player.visible {
+            display: flex;
+            transform: translateY(0);
+        }
+
+        .album-art {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            flex-shrink: 0;
+        }
+
+        .album-art img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .song-info {
+            flex-grow: 1;
+            text-align: left;
+            min-width: 0;
+        }
+
+        .song-info h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin: 0 0 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .song-info p {
+            font-size: 14px;
+            color: #6b7280;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .controls button {
+            background: transparent;
+            border: none;
+            font-size: 22px;
+            color: #4b5563;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+        }
+
+        .controls button:hover:not(:disabled) {
+            color: #667eea;
+            background: #f1f5f9;
+        }
+
+        #playPauseBtn {
+            font-size: 28px;
+            color: #667eea;
+            width: 54px;
+            height: 54px;
+        }
+        
+        .controls button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
     </style>
 </head>
@@ -371,6 +492,24 @@
             </div>
         </div>
     </div>
+    
+    <!-- Music Player -->
+    <div class="music-player" id="musicPlayer">
+        <div class="album-art">
+            <img src="https://i.scdn.co/image/ab67616d0000b2734e5df11b166c33f4078b485a" alt="Album Art" id="albumArt">
+        </div>
+        <div class="song-info">
+            <h3 id="songTitle">Título de la Canción</h3>
+            <p id="songArtist">Nombre del Artista</p>
+        </div>
+        <div class="controls">
+            <button id="prevBtn">⏮</button>
+            <button id="playPauseBtn">▶️</button>
+            <button id="nextBtn">⏭</button>
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
 
     <script>
         // --- Comienzo del script del Chatbot Amistoso ---
@@ -402,7 +541,8 @@
         function analyzeText(text) {
             return {
                 sentiment: analyzeSentiment(text),
-                isCreatorQuery: detectCreatorQuery(text)
+                isCreatorQuery: detectCreatorQuery(text),
+                musicCommand: detectMusicQuery(text)
             };
         }
 
@@ -428,8 +568,47 @@
             return creatorWords.some(word => text.toLowerCase().includes(word));
         }
 
+        function detectMusicQuery(text) {
+            const lowerCaseText = text.toLowerCase();
+            const playKeywords = ['reproduce', 'pon', 'play', 'dale', 'suena', 'música', 'canción'];
+            const pauseKeywords = ['pausa', 'para', 'stop', 'deten'];
+            const nextKeywords = ['siguiente', 'otra', 'next', 'skip'];
+            const prevKeywords = ['anterior', 'previa', 'regresa', 'previous'];
+
+            if (playKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'play' };
+            }
+            if (pauseKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'pause' };
+            }
+            if (nextKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'next' };
+            }
+            if (prevKeywords.some(word => lowerCaseText.includes(word))) {
+                return { command: 'prev' };
+            }
+            return { command: null };
+        }
+
         // Generador de respuestas conversacionales
         function generateResponse(userMessage, analysis) {
+            if (analysis.musicCommand.command) {
+                switch (analysis.musicCommand.command) {
+                    case 'play':
+                        playSong();
+                        return `¡Claro! Reproduciendo: ${songs[songIndex].title}`;
+                    case 'pause':
+                        pauseSong();
+                        return 'Música en pausa.';
+                    case 'next':
+                        nextSong();
+                        return `Ok, siguiente canción: ${songs[songIndex].title}`;
+                    case 'prev':
+                        prevSong();
+                        return `Volviendo a la anterior: ${songs[songIndex].title}`;
+                }
+            }
+
             if (analysis.isCreatorQuery) {
                 return generateCreatorResponse();
             }
@@ -452,8 +631,8 @@
             return `Fui creado por Az InnovationX, una empresa innovadora especializada en soluciones tecnológicas avanzadas.<br>
 Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
 🌐 Sitio web: <a href="https://az-innovation-x.vercel.app/" target="_blank">https://az-innovation-x.vercel.app/</a><br>
-📘 Facebook: <a href="https://www.facebook.com/AzInnovationX?mibextid=ZbWKwL" target="_blank">AzInnovationX en Facebook</a><br>
-🎵 TikTok: <a href="https://www.tiktok.com/@innovationx09?_t=ZS-8z7nlnJKq2C&_r=1" target="_blank">@innovationx09 en TikTok</a><br><br>
+📘 Facebook: <a href="https://www.facebook.com/AzInnovationX" target="_blank">AzInnovationX en Facebook</a><br>
+🎵 TikTok: <a href="https://www.tiktok.com/@innovationx09" target="_blank">@innovationx09 en TikTok</a><br><br>
 ¡Me siento orgulloso de ser una de sus creaciones!`;
         }
         
@@ -569,6 +748,99 @@ Si quieres conocer más sobre ellos, puedes visitarlos en:<br>
             
             sendBtn.disabled = false;
         }
+        
+        // --- Comienzo del script del Reproductor de Música ---
+
+        const musicPlayer = document.getElementById('musicPlayer');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const albumArt = document.getElementById('albumArt');
+        const songTitle = document.getElementById('songTitle');
+        const songArtist = document.getElementById('songArtist');
+        const prevBtn = document.getElementById('prevBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        const songs = [
+            {
+                title: 'Mortals (feat. Laura Brehm)',
+                artist: 'Warriyo',
+                audioSrc: 'https://ncs.io/track/download/784a2ccc-5ace-48d1-8af1-9da55c383960',
+                coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg'
+            },
+            {
+                title: 'Royalty',
+                artist: 'Egzod, Maestro Chives, Neoni',
+                audioSrc: 'https://ncs.io/track/download/2b08f7d9-4f5f-47bd-a608-07dec1f7eaa9',
+                coverSrc: 'https://i.ytimg.com/vi/C5fLxtJH2Qs/maxresdefault.jpg'
+            },
+            {
+                title: 'Fearless Funk',
+                artist: 'DR MØB, Chris Linton',
+                audioSrc: 'https://ncs.io/track/download/8783cd5f-c6c7-434c-b1a9-a064f1db6baa',
+                coverSrc: 'https://i.ytimg.com/vi/GrJzaEQU9Pg/maxresdefault.jpg'
+            }
+        ];
+
+        let songIndex = 0;
+        let isPlaying = false;
+
+        function loadSong(song) {
+            songTitle.textContent = song.title;
+            songArtist.textContent = song.artist;
+            audioPlayer.src = song.audioSrc;
+            albumArt.src = song.coverSrc;
+        }
+
+        function playSong() {
+            isPlaying = true;
+            playPauseBtn.textContent = '⏸️';
+            musicPlayer.classList.add('visible');
+            audioPlayer.play();
+        }
+
+        function pauseSong() {
+            isPlaying = false;
+            playPauseBtn.textContent = '▶️';
+            audioPlayer.pause();
+        }
+
+        function prevSong() {
+            songIndex--;
+            if (songIndex < 0) {
+                songIndex = songs.length - 1;
+            }
+            loadSong(songs[songIndex]);
+            playSong();
+        }
+
+        function nextSong() {
+            songIndex++;
+            if (songIndex > songs.length - 1) {
+                songIndex = 0;
+            }
+            loadSong(songs[songIndex]);
+            playSong();
+        }
+
+        playPauseBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                pauseSong();
+            } else {
+                playSong();
+            }
+        });
+
+        prevBtn.addEventListener('click', prevSong);
+        nextBtn.addEventListener('click', nextSong);
+        audioPlayer.addEventListener('ended', nextSong);
+
+        // Cargar la primera canción al inicio pero no reproducir.
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSong(songs[songIndex]);
+        });
+        
+        // --- Fin del script del Reproductor de Música ---
+
         // --- Fin del script del Chatbot Amistoso ---
     </script>
 </body>
