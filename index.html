@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #121212;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -24,23 +24,22 @@
         .app-container {
             width: 100%;
             max-width: 400px;
-            background: #1e1e1e;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            background: rgba(255,255,255,0.98);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
             display: flex;
             flex-direction: column;
             border-radius: 20px;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header {
-            background: linear-gradient(135deg, #2d3436 0%, #1a1a1a 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 25px;
             color: white;
             text-align: center;
             position: relative;
             overflow: hidden; /* To contain the canvas */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header-text {
@@ -52,18 +51,18 @@
             font-size: 28px;
             font-weight: 900;
             margin-bottom: 5px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
         .header-text p {
             font-size: 16px;
-            opacity: 0.8;
-            font-weight: 500;
+            opacity: 0.9;
+            font-weight: 600;
         }
 
         .input-area {
-            background: #121212;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            background: white;
+            border-top: 1px solid #e2e8f0;
             padding: 20px;
         }
 
@@ -75,27 +74,26 @@
         #commandInput {
             width: 100%;
             padding: 14px 20px;
-            border: 2px solid #333;
+            border: 2px solid #e2e8f0;
             border-radius: 25px;
             font-size: 16px;
             font-family: inherit;
             transition: all 0.3s ease;
-            background: #2d2d2d;
-            color: #e0e0e0;
+            background: #f8fafc;
         }
 
         #commandInput:focus {
             outline: none;
-            border-color: #555;
-            box-shadow: 0 0 0 4px rgba(85, 85, 85, 0.2);
-            background: #333;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
         }
 
         .send-btn {
             flex-shrink: 0;
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             border: none;
             border-radius: 50%;
@@ -105,12 +103,12 @@
             justify-content: center;
             font-size: 20px;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
         }
-        
+
         .send-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
         }
 
         .quick-actions {
@@ -122,13 +120,13 @@
         }
 
         .quick-actions button {
-            background-color: #333;
-            border: 1px solid #444;
+            background-color: #f1f5f9;
+            border: 1px solid #e2e8f0;
             border-radius: 20px;
             padding: 8px 16px;
             font-size: 14px;
             font-weight: 600;
-            color: #e0e0e0;
+            color: #4b5563;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -137,10 +135,10 @@
         }
 
         .quick-actions button:hover {
-            background-color: #444;
-            border-color: #555;
+            background-color: #e2e8f0;
+            border-color: #cbd5e1;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         /* --- Music Player Styles --- */
@@ -162,7 +160,7 @@
             right: 0;
             bottom: 0;
             left: 0;
-            background-color: rgba(0, 0, 0, 0.6); /* Black overlay for better text contrast */
+            background-color: rgba(0, 0, 0, 0.5); /* Black overlay for better text contrast */
         }
 
         #visualizer {
@@ -256,7 +254,7 @@
             width: 0%; /* Initial width */
             transition: width 0.1s linear;
         }
-        
+
         .time-stamps {
             display: flex;
             justify-content: space-between;
@@ -301,83 +299,6 @@
             height: 70px;
             background: rgba(255,255,255,0.3);
         }
-
-        /* --- Responsive Design --- */
-        @media (max-width: 420px) {
-            body {
-                padding: 10px;
-            }
-
-            .app-container {
-                max-width: 100%;
-                border-radius: 15px;
-            }
-
-            .header {
-                padding: 20px;
-            }
-
-            .header-text h1 {
-                font-size: 24px;
-            }
-            
-            .header-text p {
-                font-size: 14px;
-            }
-
-            .music-player {
-                padding: 20px;
-            }
-
-            .album-art {
-                width: 160px;
-                height: 160px;
-                margin-bottom: 20px;
-            }
-
-            .song-info h3 {
-                font-size: 20px;
-            }
-
-            .song-info p {
-                font-size: 14px;
-            }
-
-            .controls {
-                gap: 15px;
-            }
-
-            .controls button {
-                width: 50px;
-                height: 50px;
-                font-size: 22px;
-            }
-
-            #playPauseBtn {
-                width: 60px;
-                height: 60px;
-                font-size: 32px;
-            }
-
-            .input-area {
-                padding: 15px;
-            }
-
-            #commandInput {
-                padding: 12px 18px;
-                font-size: 15px;
-            }
-
-            .send-btn {
-                width: 45px;
-                height: 45px;
-            }
-
-            .quick-actions button {
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -413,7 +334,7 @@
                 <button id="nextBtn">⏭</button>
             </div>
         </div>
-        
+
         <div class="input-area">
             <div class="input-container">
                 <input 
@@ -424,259 +345,76 @@
                 <button class="send-btn" id="sendBtn">➤</button>
             </div>
             <div class="quick-actions">
-                <button id="addFilesBtn">🎶 Añadir Archivos</button>
-                <button id="scanFolderBtn">📁 Escanear Carpeta</button>
+                <button id="addMusicBtn">🎶 Añadir</button>
+                <button id="addMusicBtn">🎶 Añadir Archivo</button>
+                <button id="scanMusicBtn">📁 Escanear Música</button>
                 <button id="quickPlayBtn">▶️ Reproducir</button>
                 <button id="quickPauseBtn">⏸️ Pausa</button>
                 <button id="quickNextBtn">⏭️ Siguiente</button>
-            </div>
-        </div>
-    </div>
-
-    <audio id="audioPlayer"></audio>
-    <input type="file" id="fileInput" accept="audio/*" style="display: none;" multiple>
-    <input type="file" id="directoryInput" style="display: none;" webkitdirectory>
-
-    <script>
-        // --- Comienzo del script de Santiplay ---
-        
-        // --- DOM Elements ---
-        const audioPlayer = document.getElementById('audioPlayer');
-        const albumArt = document.getElementById('albumArt');
-        const songInfo = document.querySelector('.song-info');
-        const songTitle = document.getElementById('songTitle');
-        const songArtist = document.getElementById('songArtist');
-        const prevBtn = document.getElementById('prevBtn');
-        const playPauseBtn = document.getElementById('playPauseBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const quickPlayBtn = document.getElementById('quickPlayBtn');
+@@ -372,6 +373,7 @@
         const quickPauseBtn = document.getElementById('quickPauseBtn');
         const quickNextBtn = document.getElementById('quickNextBtn');
-        const addFilesBtn = document.getElementById('addFilesBtn');
-        const scanFolderBtn = document.getElementById('scanFolderBtn');
+        const addMusicBtn = document.getElementById('addMusicBtn');
+        const scanMusicBtn = document.getElementById('scanMusicBtn'); // New button
         const fileInput = document.getElementById('fileInput');
-        const directoryInput = document.getElementById('directoryInput');
         const commandInput = document.getElementById('commandInput');
         const sendBtn = document.getElementById('sendBtn');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const currentTimeEl = document.getElementById('currentTime');
-        const totalDurationEl = document.getElementById('totalDuration');
-        const visualizer = document.getElementById('visualizer');
-        const visualizerCtx = visualizer.getContext('2d');
-
-        // --- Constants ---
-        const defaultCover = 'https://i.ibb.co/Gvztj1sR/estilo-musical.png';
-
-        // --- Music Library ---
-        const songs = [
-            {
-                title: 'Mortals (feat. Laura Brehm)',
-                artist: 'Warriyo',
-                audioSrc: 'https://ncs.io/track/download/784a2ccc-5ace-48d1-8af1-9da55c383960',
-                coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg'
-            },
-            {
-                title: 'Royalty',
-                artist: 'Egzod, Maestro Chives, Neoni',
-                audioSrc: 'https://ncs.io/track/download/2b08f7d9-4f5f-47bd-a608-07dec1f7eaa9',
-                coverSrc: 'https://i.ytimg.com/vi/C5fLxtJH2Qs/maxresdefault.jpg'
-            },
-            {
-                title: 'Fearless Funk',
-                artist: 'DR MØB, Chris Linton',
-                audioSrc: 'https://ncs.io/track/download/8783cd5f-c6c7-434c-b1a9-a064f1db6baa',
-                coverSrc: 'https://i.ytimg.com/vi/GrJzaEQU9Pg/maxresdefault.jpg'
-            }
-        ];
-
-        // --- Player State ---
-        let songIndex = 0;
-        let isPlaying = false;
-        let audioCtx;
-        let analyser;
-
-        // --- Web Audio API Setup ---
-        function initAudioContext() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                const source = audioCtx.createMediaElementSource(audioPlayer);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-                analyser.fftSize = 128;
-                drawVisualizer(); 
-            }
+@@ -593,53 +595,108 @@
+            commandInput.value = '';
         }
 
-        function drawVisualizer() {
-            requestAnimationFrame(drawVisualizer);
+        // --- Directory Scanner Functions ---
+        const supportedExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg'];
 
-            if (!analyser) return;
-
-            const bufferLength = analyser.frequencyBinCount;
-            const dataArray = new Uint8Array(bufferLength);
-            analyser.getByteFrequencyData(dataArray);
-
-            visualizerCtx.clearRect(0, 0, visualizer.width, visualizer.height);
-
-            const barWidth = (visualizer.width / bufferLength);
-            let barHeight;
-            let x = 0;
-
-            for (let i = 0; i < bufferLength; i++) {
-                barHeight = dataArray[i] / 3;
-                
-                const opacity = barHeight / 200; // Make it more subtle
-                visualizerCtx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-                visualizerCtx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
-
-                x += barWidth;
-            }
-        }
-
-        // --- Core Player Functions ---
-        function loadSong(song) {
-            songTitle.textContent = song.title;
-            songArtist.textContent = song.artist;
-            audioPlayer.src = song.audioSrc;
-            albumArt.src = song.coverSrc || defaultCover;
-        }
-
-
-        function playSong() {
-            initAudioContext();
-            isPlaying = true;
-            albumArt.classList.add('rotating');
-            playPauseBtn.textContent = '⏸️';
-            audioPlayer.play();
-        }
-
-        function pauseSong() {
-            isPlaying = false;
-            albumArt.classList.remove('rotating');
-            playPauseBtn.textContent = '▶️';
-            audioPlayer.pause();
-        }
-
-        function prevSong() {
-            songIndex = (songIndex - 1 + songs.length) % songs.length;
-
-            albumArt.classList.add('fade-out');
-            songInfo.classList.add('fade-out');
-
-            setTimeout(() => {
-                loadSong(songs[songIndex]);
-                playSong();
-                albumArt.classList.remove('fade-out');
-                songInfo.classList.remove('fade-out');
-            }, 400);
-        }
-
-        function nextSong() {
-            songIndex = (songIndex + 1) % songs.length;
-            
-            albumArt.classList.add('fade-out');
-            songInfo.classList.add('fade-out');
-
-            setTimeout(() => {
-                loadSong(songs[songIndex]);
-                playSong();
-                albumArt.classList.remove('fade-out');
-                songInfo.classList.remove('fade-out');
-            }, 400);
-        }
-
-        // --- Progress Bar & Time Functions ---
-        function updateProgressBar(e) {
-            const { duration, currentTime } = e.srcElement;
-            if (duration) {
-                const progressPercent = (currentTime / duration) * 100;
-                progressBar.style.width = `${progressPercent}%`;
-                totalDurationEl.textContent = formatTime(duration);
-            }
-            currentTimeEl.textContent = formatTime(currentTime);
-        }
-
-        function formatTime(seconds) {
-            if (isNaN(seconds)) return '0:00';
-            const minutes = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
-            return `${minutes}:${secs}`;
-        }
-
-        function setProgressBar(e) {
-            const width = this.clientWidth;
-            const clickX = e.offsetX;
-            const { duration } = audioPlayer;
-            if (duration) {
-                audioPlayer.currentTime = (clickX / width) * duration;
-            }
-        }
-
-        // --- Command Processing ---
-        function detectMusicQuery(text) {
-            const lowerCaseText = text.toLowerCase();
-            // Removed generic words like 'música', 'canción' to avoid conflicts with search.
-            const playKeywords = ['reproduce', 'pon', 'play', 'dale', 'suena'];
-            const pauseKeywords = ['pausa', 'para', 'stop', 'deten'];
-            const nextKeywords = ['siguiente', 'otra', 'next', 'skip'];
-            const prevKeywords = ['anterior', 'previa', 'regresa', 'previous'];
-
-            if (playKeywords.some(word => lowerCaseText.includes(word))) return { command: 'play' };
-            if (pauseKeywords.some(word => lowerCaseText.includes(word))) return { command: 'pause' };
-            if (nextKeywords.some(word => lowerCaseText.includes(word))) return { command: 'next' };
-            if (prevKeywords.some(word => lowerCaseText.includes(word))) return { command: 'prev' };
-            return { command: null };
-        }
-
-        function processCommand() {
-            const commandText = commandInput.value.trim();
-            if (!commandText) return;
-
-            const lowerCaseText = commandText.toLowerCase();
-
-            // 1. Prioritize searching for a song by title
-            const foundSongIndex = songs.findIndex(song => song.title.toLowerCase().includes(lowerCaseText));
-
-            if (foundSongIndex !== -1) {
-                songIndex = foundSongIndex;
-                
-                albumArt.classList.add('fade-out');
-                songInfo.classList.add('fade-out');
-                
-                setTimeout(() => {
-                    loadSong(songs[songIndex]);
-                    playSong();
-                    albumArt.classList.remove('fade-out');
-                    songInfo.classList.remove('fade-out');
-                }, 400);
-
-                commandInput.value = '';
-                return; // Exit after finding and playing the song
-            }
-
-            // 2. If no song is found, process as a command
-            const analysis = detectMusicQuery(commandText);
-            
-            if (analysis.command) {
-                switch (analysis.command) {
-                    case 'play':
-                        playSong();
-                        break;
-                    case 'pause':
-                        pauseSong();
-                        break;
-                    case 'next':
-                        nextSong();
-                        break;
-                    case 'prev':
-                        prevSong();
-                        break;
+        async function processDirectory(directoryHandle, newSongs) {
+            for await (const entry of directoryHandle.values()) {
+                if (entry.kind === 'file') {
+                    const isSupported = supportedExtensions.some(ext => entry.name.toLowerCase().endsWith(ext));
+                    if (isSupported) {
+                        const file = await entry.getFile();
+                        const newSong = {
+                            title: file.name.replace(/\.[^/.]+$/, ""),
+                            artist: 'Música Local',
+                            audioSrc: URL.createObjectURL(file),
+                            coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg' // Default cover
+                        };
+                        newSongs.push(newSong);
+                    }
+                } else if (entry.kind === 'directory') {
+                    await processDirectory(entry, newSongs);
                 }
             }
-            
-            commandInput.value = '';
+        }
+
+        async function scanDirectoryForMusic() {
+            if (!('showDirectoryPicker' in window)) {
+                alert('Tu navegador no soporta la API de Acceso al Sistema de Archivos. Prueba con Chrome o Edge.');
+                return;
+            }
+
+            try {
+                const directoryHandle = await window.showDirectoryPicker();
+                const newSongs = [];
+                const initialSongCount = songs.length;
+                await processDirectory(directoryHandle, newSongs);
+                
+                if (newSongs.length > 0) {
+                    songs.push(...newSongs);
+                    songIndex = initialSongCount; // Set index to the first new song
+                    loadSong(songs[songIndex]);
+                    alert(`¡Éxito! Se añadieron ${newSongs.length} canciones a tu lista.`);
+                } else {
+                    alert('No se encontraron archivos de música compatibles en la carpeta seleccionada.');
+                }
+
+            } catch (err) {
+                // Handle cases where the user closes the picker
+                if (err.name === 'AbortError') {
+                    console.log('El usuario cerró el selector de directorio.');
+                } else {
+                    console.error('Error al seleccionar el directorio:', err);
+                }
+            }
         }
 
         // --- Event Listeners ---
@@ -684,6 +422,7 @@
             isPlaying ? pauseSong() : playSong();
         });
         prevBtn.addEventListener('click', prevSong);
+        scanMusicBtn.addEventListener('click', scanDirectoryForMusic);
         nextBtn.addEventListener('click', nextSong);
         audioPlayer.addEventListener('ended', nextSong);
         audioPlayer.addEventListener('timeupdate', updateProgressBar);
@@ -698,13 +437,7 @@
                 processCommand();
             }
         });
-
-        // Listener for adding individual files
-        addFilesBtn.addEventListener('click', () => fileInput.click());
-        
-        // Listener for scanning a folder
-        scanFolderBtn.addEventListener('click', () => directoryInput.click());
-
+        addMusicBtn.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (event) => {
             const files = event.target.files;
             if (!files.length) return;
@@ -715,49 +448,15 @@
                     title: file.name.replace(/\.[^/.]+$/, ""),
                     artist: 'Archivo Local',
                     audioSrc: URL.createObjectURL(file),
-                    coverSrc: defaultCover
+                    coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg' // Default cover
                 };
                 songs.push(newSong);
             }
 
             // Load and play the first of the newly added songs
             songIndex = songs.length - files.length;
+            audioPlayer.addEventListener('canplay', playSong, { once: true });
             loadSong(songs[songIndex]);
-            playSong();
-        });
-
-        directoryInput.addEventListener('change', (event) => {
-            const files = event.target.files;
-            if (!files.length) return;
-
-            const supportedExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg'];
-            const newSongs = [];
-
-            for (const file of files) {
-                const isSupported = supportedExtensions.some(ext => file.name.toLowerCase().endsWith(ext));
-                if (isSupported) {
-                    const newSong = {
-                        title: file.name.replace(/\.[^/.]+$/, ""),
-                        artist: 'Música Local',
-                        audioSrc: URL.createObjectURL(file),
-                        coverSrc: defaultCover
-                    };
-                    newSongs.push(newSong);
-                }
-            }
-            
-            if (newSongs.length > 0) {
-                const firstNewSongIndex = songs.length;
-                songs.push(...newSongs);
-                songIndex = firstNewSongIndex;
-                
-                // Load and play the song directly
-                loadSong(songs[songIndex]);
-                playSong();
-
-            } else {
-                alert('No se encontraron archivos de música compatibles en la carpeta seleccionada.');
-            }
         });
 
         // --- Initial Load ---
