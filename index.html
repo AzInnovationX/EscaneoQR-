@@ -709,8 +709,6 @@
             const files = event.target.files;
             if (!files.length) return;
 
-            initAudioContext(); // Initialize audio context on user gesture
-
             // Add all selected files to the songs array
             for (const file of files) {
                 const newSong = {
@@ -724,15 +722,13 @@
 
             // Load and play the first of the newly added songs
             songIndex = songs.length - files.length;
-            audioPlayer.addEventListener('canplay', playSong, { once: true });
             loadSong(songs[songIndex]);
+            playSong();
         });
 
         directoryInput.addEventListener('change', (event) => {
             const files = event.target.files;
             if (!files.length) return;
-
-            initAudioContext(); // Initialize audio context on user gesture
 
             const supportedExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg'];
             const newSongs = [];
@@ -755,11 +751,9 @@
                 songs.push(...newSongs);
                 songIndex = firstNewSongIndex;
                 
-                // Add a one-time event listener to play the song when it's ready
-                audioPlayer.addEventListener('canplay', playSong, { once: true });
-
-                // Load the song, which will trigger the 'canplay' event
+                // Load and play the song directly
                 loadSong(songs[songIndex]);
+                playSong();
 
             } else {
                 alert('No se encontraron archivos de música compatibles en la carpeta seleccionada.');
