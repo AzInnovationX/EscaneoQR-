@@ -13,7 +13,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #121212;
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -24,22 +24,23 @@
         .app-container {
             width: 100%;
             max-width: 400px;
-            background: rgba(255,255,255,0.98);
-            backdrop-filter: blur(20px);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+            background: #1e1e1e;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
             display: flex;
             flex-direction: column;
             border-radius: 20px;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2d3436 0%, #1a1a1a 100%);
             padding: 25px;
             color: white;
             text-align: center;
             position: relative;
             overflow: hidden; /* To contain the canvas */
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header-text {
@@ -51,18 +52,18 @@
             font-size: 28px;
             font-weight: 900;
             margin-bottom: 5px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
         }
 
         .header-text p {
             font-size: 16px;
-            opacity: 0.9;
-            font-weight: 600;
+            opacity: 0.8;
+            font-weight: 500;
         }
 
         .input-area {
-            background: white;
-            border-top: 1px solid #e2e8f0;
+            background: #121212;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding: 20px;
         }
 
@@ -74,26 +75,27 @@
         #commandInput {
             width: 100%;
             padding: 14px 20px;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #333;
             border-radius: 25px;
             font-size: 16px;
             font-family: inherit;
             transition: all 0.3s ease;
-            background: #f8fafc;
+            background: #2d2d2d;
+            color: #e0e0e0;
         }
 
         #commandInput:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            background: white;
+            border-color: #555;
+            box-shadow: 0 0 0 4px rgba(85, 85, 85, 0.2);
+            background: #333;
         }
 
         .send-btn {
             flex-shrink: 0;
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
             color: white;
             border: none;
             border-radius: 50%;
@@ -103,12 +105,12 @@
             justify-content: center;
             font-size: 20px;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
         
         .send-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
         }
 
         .quick-actions {
@@ -120,13 +122,13 @@
         }
 
         .quick-actions button {
-            background-color: #f1f5f9;
-            border: 1px solid #e2e8f0;
+            background-color: #333;
+            border: 1px solid #444;
             border-radius: 20px;
             padding: 8px 16px;
             font-size: 14px;
             font-weight: 600;
-            color: #4b5563;
+            color: #e0e0e0;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -135,10 +137,10 @@
         }
 
         .quick-actions button:hover {
-            background-color: #e2e8f0;
-            border-color: #cbd5e1;
+            background-color: #444;
+            border-color: #555;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
         /* --- Music Player Styles --- */
@@ -160,7 +162,7 @@
             right: 0;
             bottom: 0;
             left: 0;
-            background-color: rgba(0, 0, 0, 0.5); /* Black overlay for better text contrast */
+            background-color: rgba(0, 0, 0, 0.6); /* Black overlay for better text contrast */
         }
 
         #visualizer {
@@ -463,6 +465,9 @@
         const visualizer = document.getElementById('visualizer');
         const visualizerCtx = visualizer.getContext('2d');
 
+        // --- Constants ---
+        const defaultCover = 'https://i.ibb.co/Gvztj1sR/estilo-musical.png';
+
         // --- Music Library ---
         const songs = [
             {
@@ -535,7 +540,7 @@
             songTitle.textContent = song.title;
             songArtist.textContent = song.artist;
             audioPlayer.src = song.audioSrc;
-            albumArt.src = song.coverSrc;
+            albumArt.src = song.coverSrc || defaultCover;
         }
 
 
@@ -710,7 +715,7 @@
                     title: file.name.replace(/\.[^/.]+$/, ""),
                     artist: 'Archivo Local',
                     audioSrc: URL.createObjectURL(file),
-                    coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg' // Default cover
+                    coverSrc: defaultCover
                 };
                 songs.push(newSong);
             }
@@ -735,18 +740,28 @@
                         title: file.name.replace(/\.[^/.]+$/, ""),
                         artist: 'Música Local',
                         audioSrc: URL.createObjectURL(file),
-                        coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg' // Default cover
+                        coverSrc: defaultCover
                     };
                     newSongs.push(newSong);
                 }
             }
             
             if (newSongs.length > 0) {
-                const initialSongCount = songs.length;
+                songs.length = 0; // Clear the existing playlist
                 songs.push(...newSongs);
-                songIndex = initialSongCount; // Set index to the first new song
-                loadSong(songs[songIndex]);
-                alert(`¡Éxito! Se añadieron ${newSongs.length} canciones a tu lista.`);
+                songIndex = 0; // Start from the beginning of the new list
+                
+                // Fade out, load the new song, and then play it
+                albumArt.classList.add('fade-out');
+                songInfo.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    loadSong(songs[songIndex]);
+                    playSong();
+                    albumArt.classList.remove('fade-out');
+                    songInfo.classList.remove('fade-out');
+                }, 400);
+
             } else {
                 alert('No se encontraron archivos de música compatibles en la carpeta seleccionada.');
             }
