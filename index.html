@@ -353,7 +353,8 @@
         // --- Command Processing ---
         function detectMusicQuery(text) {
             const lowerCaseText = text.toLowerCase();
-            const playKeywords = ['reproduce', 'pon', 'play', 'dale', 'suena', 'música', 'canción'];
+            // Removed generic words like 'música', 'canción' to avoid conflicts with search.
+            const playKeywords = ['reproduce', 'pon', 'play', 'dale', 'suena'];
             const pauseKeywords = ['pausa', 'para', 'stop', 'deten'];
             const nextKeywords = ['siguiente', 'otra', 'next', 'skip'];
             const prevKeywords = ['anterior', 'previa', 'regresa', 'previous'];
@@ -369,16 +370,39 @@
             const commandText = commandInput.value.trim();
             if (!commandText) return;
 
+            const lowerCaseText = commandText.toLowerCase();
+
+            // 1. Prioritize searching for a song by title
+            const foundSongIndex = songs.findIndex(song => song.title.toLowerCase().includes(lowerCaseText));
+
+            if (foundSongIndex !== -1) {
+                songIndex = foundSongIndex;
+                loadSong(songs[songIndex]);
+                playSong();
+                commandInput.value = '';
+                return; // Exit after finding and playing the song
+            }
+
+            // 2. If no song is found, process as a command
             const analysis = detectMusicQuery(commandText);
             
             if (analysis.command) {
                 switch (analysis.command) {
-                    case 'play': playSong(); break;
-                    case 'pause': pauseSong(); break;
-                    case 'next': nextSong(); break;
-                    case 'prev': prevSong(); break;
+                    case 'play':
+                        playSong();
+                        break;
+                    case 'pause':
+                        pauseSong();
+                        break;
+                    case 'next':
+                        nextSong();
+                        break;
+                    case 'prev':
+                        prevSong();
+                        break;
                 }
             }
+            
             commandInput.value = '';
         }
 
@@ -421,7 +445,7 @@
         });
 
         // --- Initial Load ---
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded',_ => {
             loadSong(songs[songIndex]);
             console.log('🧠 Santiplay inicializado.');
         });
