@@ -38,11 +38,18 @@
             padding: 25px;
             color: white;
             text-align: center;
+            position: relative;
+            overflow: hidden; /* To contain the canvas */
+        }
+
+        .header-text {
+            position: relative;
+            z-index: 1;
         }
 
         .header-text h1 {
             font-size: 28px;
-            font-weight: 800;
+            font-weight: 900;
             margin-bottom: 5px;
             text-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
@@ -50,7 +57,7 @@
         .header-text p {
             font-size: 16px;
             opacity: 0.9;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .input-area {
@@ -101,6 +108,7 @@
         
         .send-btn:hover {
             transform: scale(1.1);
+            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
         }
 
         .quick-actions {
@@ -117,7 +125,7 @@
             border-radius: 20px;
             padding: 8px 16px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             color: #4b5563;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -129,6 +137,8 @@
         .quick-actions button:hover {
             background-color: #e2e8f0;
             border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
 
         /* --- Music Player Styles --- */
@@ -138,7 +148,7 @@
             align-items: center;
             padding: 30px;
             position: relative;
-            background-image: url('https://i.ibb.co/8nPwzrQW/a0445440d2fa611f0fdb7562c36322d5.gif');
+            /* background-image: url('https://i.ibb.co/8nPwzrQW/a0445440d2fa611f0fdb7562c36322d5.gif'); */
             background-size: cover;
             background-position: center;
         }
@@ -153,6 +163,15 @@
             background-color: rgba(0, 0, 0, 0.5); /* Black overlay for better text contrast */
         }
 
+        #visualizer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
         .album-art, .song-info, .controls {
             position: relative; /* Ensure content is above the overlay */
             z-index: 1;
@@ -165,6 +184,7 @@
             overflow: hidden;
             box-shadow: 0 15px 40px -10px rgba(0,0,0,0.4);
             margin-bottom: 25px;
+            transition: opacity 0.4s ease-in-out;
         }
 
         .album-art img {
@@ -173,14 +193,32 @@
             object-fit: cover;
         }
 
+        .album-art.rotating {
+            animation: rotate 30s linear infinite;
+        }
+
+        .album-art.fade-out, .song-info.fade-out {
+            opacity: 0;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .song-info {
             text-align: center;
             margin-bottom: 20px;
+            transition: opacity 0.4s ease-in-out;
         }
 
         .song-info h3 {
             font-size: 24px;
-            font-weight: 700;
+            font-weight: 800;
             color: #ffffff; /* Change text to white for contrast */
             margin: 0 0 8px;
             text-shadow: 0 1px 5px rgba(0,0,0,0.5);
@@ -191,6 +229,40 @@
             color: #e0e0e0; /* Change text to light gray */
             margin: 0;
             text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+            font-weight: 500;
+        }
+
+        .progress-details {
+            width: 85%;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .progress-container {
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            cursor: pointer;
+            height: 8px;
+            width: 100%;
+        }
+
+        .progress-bar {
+            background: #ffffff;
+            border-radius: 5px;
+            height: 100%;
+            width: 0%; /* Initial width */
+            transition: width 0.1s linear;
+        }
+        
+        .time-stamps {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #e0e0e0;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
         .controls {
@@ -217,6 +289,7 @@
 
         .controls button:hover:not(:disabled) {
             background: rgba(255,255,255,0.4);
+            transform: scale(1.1);
         }
 
         #playPauseBtn {
@@ -231,6 +304,7 @@
 <body>
     <div class="app-container">
         <div class="header">
+            <canvas id="visualizer"></canvas>
             <div class="header-text">
                 <h1>Santiplay</h1>
                 <p>Escribe un comando o usa los botones</p>
@@ -244,6 +318,15 @@
             <div class="song-info">
                 <h3 id="songTitle">Título de la Canción</h3>
                 <p id="songArtist">Nombre del Artista</p>
+            </div>
+            <div class="progress-details">
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="time-stamps">
+                    <span id="currentTime">0:00</span>
+                    <span id="totalDuration">0:00</span>
+                </div>
             </div>
             <div class="controls">
                 <button id="prevBtn">⏮</button>
@@ -279,6 +362,7 @@
         // --- DOM Elements ---
         const audioPlayer = document.getElementById('audioPlayer');
         const albumArt = document.getElementById('albumArt');
+        const songInfo = document.querySelector('.song-info');
         const songTitle = document.getElementById('songTitle');
         const songArtist = document.getElementById('songArtist');
         const prevBtn = document.getElementById('prevBtn');
@@ -291,6 +375,12 @@
         const fileInput = document.getElementById('fileInput');
         const commandInput = document.getElementById('commandInput');
         const sendBtn = document.getElementById('sendBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalDurationEl = document.getElementById('totalDuration');
+        const visualizer = document.getElementById('visualizer');
+        const visualizerCtx = visualizer.getContext('2d');
 
         // --- Music Library ---
         const songs = [
@@ -317,6 +407,47 @@
         // --- Player State ---
         let songIndex = 0;
         let isPlaying = false;
+        let audioCtx;
+        let analyser;
+
+        // --- Web Audio API Setup ---
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaElementSource(audioPlayer);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                analyser.fftSize = 128;
+                drawVisualizer(); 
+            }
+        }
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+
+            if (!analyser) return;
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            visualizerCtx.clearRect(0, 0, visualizer.width, visualizer.height);
+
+            const barWidth = (visualizer.width / bufferLength);
+            let barHeight;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 3;
+                
+                const opacity = barHeight / 200; // Make it more subtle
+                visualizerCtx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                visualizerCtx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
+
+                x += barWidth;
+            }
+        }
 
         // --- Core Player Functions ---
         function loadSong(song) {
@@ -326,28 +457,75 @@
             albumArt.src = song.coverSrc;
         }
 
+
         function playSong() {
+            initAudioContext();
             isPlaying = true;
+            albumArt.classList.add('rotating');
             playPauseBtn.textContent = '⏸️';
             audioPlayer.play();
         }
 
         function pauseSong() {
             isPlaying = false;
+            albumArt.classList.remove('rotating');
             playPauseBtn.textContent = '▶️';
             audioPlayer.pause();
         }
 
         function prevSong() {
             songIndex = (songIndex - 1 + songs.length) % songs.length;
-            loadSong(songs[songIndex]);
-            playSong();
+
+            albumArt.classList.add('fade-out');
+            songInfo.classList.add('fade-out');
+
+            setTimeout(() => {
+                loadSong(songs[songIndex]);
+                playSong();
+                albumArt.classList.remove('fade-out');
+                songInfo.classList.remove('fade-out');
+            }, 400);
         }
 
         function nextSong() {
             songIndex = (songIndex + 1) % songs.length;
-            loadSong(songs[songIndex]);
-            playSong();
+            
+            albumArt.classList.add('fade-out');
+            songInfo.classList.add('fade-out');
+
+            setTimeout(() => {
+                loadSong(songs[songIndex]);
+                playSong();
+                albumArt.classList.remove('fade-out');
+                songInfo.classList.remove('fade-out');
+            }, 400);
+        }
+
+        // --- Progress Bar & Time Functions ---
+        function updateProgressBar(e) {
+            const { duration, currentTime } = e.srcElement;
+            if (duration) {
+                const progressPercent = (currentTime / duration) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+                totalDurationEl.textContent = formatTime(duration);
+            }
+            currentTimeEl.textContent = formatTime(currentTime);
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${secs}`;
+        }
+
+        function setProgressBar(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const { duration } = audioPlayer;
+            if (duration) {
+                audioPlayer.currentTime = (clickX / width) * duration;
+            }
         }
 
         // --- Command Processing ---
@@ -377,8 +555,17 @@
 
             if (foundSongIndex !== -1) {
                 songIndex = foundSongIndex;
-                loadSong(songs[songIndex]);
-                playSong();
+                
+                albumArt.classList.add('fade-out');
+                songInfo.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    loadSong(songs[songIndex]);
+                    playSong();
+                    albumArt.classList.remove('fade-out');
+                    songInfo.classList.remove('fade-out');
+                }, 400);
+
                 commandInput.value = '';
                 return; // Exit after finding and playing the song
             }
@@ -413,6 +600,9 @@
         prevBtn.addEventListener('click', prevSong);
         nextBtn.addEventListener('click', nextSong);
         audioPlayer.addEventListener('ended', nextSong);
+        audioPlayer.addEventListener('timeupdate', updateProgressBar);
+        audioPlayer.addEventListener('loadedmetadata', updateProgressBar);
+        progressContainer.addEventListener('click', setProgressBar);
         quickPlayBtn.addEventListener('click', playSong);
         quickPauseBtn.addEventListener('click', pauseSong);
         quickNextBtn.addEventListener('click', nextSong);
