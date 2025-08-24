@@ -351,7 +351,26 @@
                 <button id="quickPlayBtn">▶️ Reproducir</button>
                 <button id="quickPauseBtn">⏸️ Pausa</button>
                 <button id="quickNextBtn">⏭️ Siguiente</button>
-@@ -372,6 +373,7 @@
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+    <input type="file" id="fileInput" accept="audio/*" style="display: none;" multiple>
+
+    <script>
+        // --- Comienzo del script de Santiplay ---
+
+        // --- DOM Elements ---
+        const audioPlayer = document.getElementById('audioPlayer');
+        const albumArt = document.getElementById('albumArt');
+        const songInfo = document.querySelector('.song-info');
+        const songTitle = document.getElementById('songTitle');
+        const songArtist = document.getElementById('songArtist');
+        const prevBtn = document.getElementById('prevBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const quickPlayBtn = document.getElementById('quickPlayBtn');
         const quickPauseBtn = document.getElementById('quickPauseBtn');
         const quickNextBtn = document.getElementById('quickNextBtn');
         const addMusicBtn = document.getElementById('addMusicBtn');
@@ -359,7 +378,221 @@
         const fileInput = document.getElementById('fileInput');
         const commandInput = document.getElementById('commandInput');
         const sendBtn = document.getElementById('sendBtn');
-@@ -593,53 +595,108 @@
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalDurationEl = document.getElementById('totalDuration');
+        const visualizer = document.getElementById('visualizer');
+        const visualizerCtx = visualizer.getContext('2d');
+
+        // --- Music Library ---
+        const songs = [
+            {
+                title: 'Mortals (feat. Laura Brehm)',
+                artist: 'Warriyo',
+                audioSrc: 'https://ncs.io/track/download/784a2ccc-5ace-48d1-8af1-9da55c383960',
+                coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg'
+            },
+            {
+                title: 'Royalty',
+                artist: 'Egzod, Maestro Chives, Neoni',
+                audioSrc: 'https://ncs.io/track/download/2b08f7d9-4f5f-47bd-a608-07dec1f7eaa9',
+                coverSrc: 'https://i.ytimg.com/vi/C5fLxtJH2Qs/maxresdefault.jpg'
+            },
+            {
+                title: 'Fearless Funk',
+                artist: 'DR MØB, Chris Linton',
+                audioSrc: 'https://ncs.io/track/download/8783cd5f-c6c7-434c-b1a9-a064f1db6baa',
+                coverSrc: 'https://i.ytimg.com/vi/GrJzaEQU9Pg/maxresdefault.jpg'
+            }
+        ];
+
+        // --- Player State ---
+        let songIndex = 0;
+        let isPlaying = false;
+        let audioCtx;
+        let analyser;
+
+        // --- Web Audio API Setup ---
+        function initAudioContext() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                const source = audioCtx.createMediaElementSource(audioPlayer);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                analyser.fftSize = 128;
+                drawVisualizer(); 
+            }
+        }
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+
+            if (!analyser) return;
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyser.getByteFrequencyData(dataArray);
+
+            visualizerCtx.clearRect(0, 0, visualizer.width, visualizer.height);
+
+            const barWidth = (visualizer.width / bufferLength);
+            let barHeight;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 3;
+
+                const opacity = barHeight / 200; // Make it more subtle
+                visualizerCtx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
+                visualizerCtx.fillRect(x, visualizer.height - barHeight, barWidth, barHeight);
+
+                x += barWidth;
+            }
+        }
+
+        // --- Core Player Functions ---
+        function loadSong(song) {
+            songTitle.textContent = song.title;
+            songArtist.textContent = song.artist;
+            audioPlayer.src = song.audioSrc;
+            albumArt.src = song.coverSrc;
+        }
+
+
+        function playSong() {
+            initAudioContext();
+            isPlaying = true;
+            albumArt.classList.add('rotating');
+            playPauseBtn.textContent = '⏸️';
+            audioPlayer.play();
+        }
+
+        function pauseSong() {
+            isPlaying = false;
+            albumArt.classList.remove('rotating');
+            playPauseBtn.textContent = '▶️';
+            audioPlayer.pause();
+        }
+
+        function prevSong() {
+            songIndex = (songIndex - 1 + songs.length) % songs.length;
+
+            albumArt.classList.add('fade-out');
+            songInfo.classList.add('fade-out');
+
+            setTimeout(() => {
+                loadSong(songs[songIndex]);
+                playSong();
+                albumArt.classList.remove('fade-out');
+                songInfo.classList.remove('fade-out');
+            }, 400);
+        }
+
+        function nextSong() {
+            songIndex = (songIndex + 1) % songs.length;
+
+            albumArt.classList.add('fade-out');
+            songInfo.classList.add('fade-out');
+
+            setTimeout(() => {
+                loadSong(songs[songIndex]);
+                playSong();
+                albumArt.classList.remove('fade-out');
+                songInfo.classList.remove('fade-out');
+            }, 400);
+        }
+
+        // --- Progress Bar & Time Functions ---
+        function updateProgressBar(e) {
+            const { duration, currentTime } = e.srcElement;
+            if (duration) {
+                const progressPercent = (currentTime / duration) * 100;
+                progressBar.style.width = `${progressPercent}%`;
+                totalDurationEl.textContent = formatTime(duration);
+            }
+            currentTimeEl.textContent = formatTime(currentTime);
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return '0:00';
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60).toString().padStart(2, '0');
+            return `${minutes}:${secs}`;
+        }
+
+        function setProgressBar(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const { duration } = audioPlayer;
+            if (duration) {
+                audioPlayer.currentTime = (clickX / width) * duration;
+            }
+        }
+
+        // --- Command Processing ---
+        function detectMusicQuery(text) {
+            const lowerCaseText = text.toLowerCase();
+            // Removed generic words like 'música', 'canción' to avoid conflicts with search.
+            const playKeywords = ['reproduce', 'pon', 'play', 'dale', 'suena'];
+            const pauseKeywords = ['pausa', 'para', 'stop', 'deten'];
+            const nextKeywords = ['siguiente', 'otra', 'next', 'skip'];
+            const prevKeywords = ['anterior', 'previa', 'regresa', 'previous'];
+
+            if (playKeywords.some(word => lowerCaseText.includes(word))) return { command: 'play' };
+            if (pauseKeywords.some(word => lowerCaseText.includes(word))) return { command: 'pause' };
+            if (nextKeywords.some(word => lowerCaseText.includes(word))) return { command: 'next' };
+            if (prevKeywords.some(word => lowerCaseText.includes(word))) return { command: 'prev' };
+            return { command: null };
+        }
+
+        function processCommand() {
+            const commandText = commandInput.value.trim();
+            if (!commandText) return;
+
+            const lowerCaseText = commandText.toLowerCase();
+
+            // 1. Prioritize searching for a song by title
+            const foundSongIndex = songs.findIndex(song => song.title.toLowerCase().includes(lowerCaseText));
+
+            if (foundSongIndex !== -1) {
+                songIndex = foundSongIndex;
+
+                albumArt.classList.add('fade-out');
+                songInfo.classList.add('fade-out');
+
+                setTimeout(() => {
+                    loadSong(songs[songIndex]);
+                    playSong();
+                    albumArt.classList.remove('fade-out');
+                    songInfo.classList.remove('fade-out');
+                }, 400);
+
+                commandInput.value = '';
+                return; // Exit after finding and playing the song
+            }
+
+            // 2. If no song is found, process as a command
+            const analysis = detectMusicQuery(commandText);
+
+            if (analysis.command) {
+                switch (analysis.command) {
+                    case 'play':
+                        playSong();
+                        break;
+                    case 'pause':
+                        pauseSong();
+                        break;
+                    case 'next':
+                        nextSong();
+                        break;
+                    case 'prev':
+                        prevSong();
+                        break;
+                }
+            }
+
             commandInput.value = '';
         }
 
