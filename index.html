@@ -709,6 +709,8 @@
             const files = event.target.files;
             if (!files.length) return;
 
+            initAudioContext(); // Initialize audio context on user gesture
+
             // Add all selected files to the songs array
             for (const file of files) {
                 const newSong = {
@@ -729,6 +731,8 @@
         directoryInput.addEventListener('change', (event) => {
             const files = event.target.files;
             if (!files.length) return;
+
+            initAudioContext(); // Initialize audio context on user gesture
 
             const supportedExtensions = ['.mp3', '.wav', '.m4a', '.flac', '.ogg'];
             const newSongs = [];
