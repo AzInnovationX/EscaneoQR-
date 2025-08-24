@@ -747,9 +747,9 @@
             }
             
             if (newSongs.length > 0) {
-                songs.length = 0; // Clear the existing playlist
+                const firstNewSongIndex = songs.length;
                 songs.push(...newSongs);
-                songIndex = 0; // Start from the beginning of the new list
+                songIndex = firstNewSongIndex;
                 
                 // Add a one-time event listener to play the song when it's ready
                 audioPlayer.addEventListener('canplay', playSong, { once: true });
