@@ -1892,7 +1892,7 @@
     </div>
 
     <!-- Audio Element -->
-    <audio id="audioPlayer"></audio>
+    <audio id="audioPlayer" preload="metadata"></audio>
 
     <script>
         // App State
@@ -1925,7 +1925,8 @@
             touchStartY: 0,
             touchEndX: 0,
             touchEndY: 0,
-            isFullscreen: false
+            isFullscreen: false,
+            audioInitialized: false
         };
 
         // DOM Elements
@@ -2037,17 +2038,14 @@
             // Render initial view
             renderView(app.currentView);
             
-            // Initialize audio context
-            initAudioContext();
-            
             // Load saved settings
             loadSettings();
             
             // Setup touch gestures
             setupTouchGestures();
             
-            // Setup visualizer
-            setupVisualizer();
+            // Setup audio context on first user interaction
+            setupAudioContext();
         }
 
         // Load Sample Songs
@@ -2061,7 +2059,7 @@
                     genre: 'Electronic',
                     year: 2016,
                     duration: 195,
-                    audioSrc: 'https://ncs.io/track/download/784a2ccc-5ace-48d1-8af1-9da55c383960',
+                    audioSrc: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
                     coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg',
                     isFavorite: false
                 },
@@ -2073,7 +2071,7 @@
                     genre: 'Electronic',
                     year: 2020,
                     duration: 195,
-                    audioSrc: 'https://ncs.io/track/download/2b08f7d9-4f5f-47bd-a608-07dec1f7eaa9',
+                    audioSrc: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
                     coverSrc: 'https://i.ytimg.com/vi/C5fLxtJH2Qs/maxresdefault.jpg',
                     isFavorite: false
                 },
@@ -2085,7 +2083,7 @@
                     genre: 'Electronic',
                     year: 2019,
                     duration: 193,
-                    audioSrc: 'https://ncs.io/track/download/8783cd5f-c6c7-434c-b1a9-a064f1db6baa',
+                    audioSrc: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
                     coverSrc: 'https://i.ytimg.com/vi/GrJzaEQU9Pg/maxresdefault.jpg',
                     isFavorite: false
                 },
@@ -2097,7 +2095,7 @@
                     genre: 'Electronic',
                     year: 2015,
                     duration: 244,
-                    audioSrc: 'https://ncs.io/track/download/4a4e5e2e-9e9a-4e8a-8f1a-1d1c1c1c1c1c',
+                    audioSrc: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
                     coverSrc: 'https://i.ytimg.com/vi/J2X5mJ3HDYE/maxresdefault.jpg',
                     isFavorite: false
                 },
@@ -2109,7 +2107,7 @@
                     genre: 'Electronic',
                     year: 2016,
                     duration: 242,
-                    audioSrc: 'https://ncs.io/track/download/5a5e5e2e-9e9a-4e8a-8f1a-1d1c1c1c1c1c',
+                    audioSrc: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
                     coverSrc: 'https://i.ytimg.com/vi/__CRWE-L45k/maxresdefault.jpg',
                     isFavorite: false
                 },
@@ -2121,7 +2119,7 @@
                     genre: 'Electronic',
                     year: 2014,
                     duration: 277,
-                    audioSrc: 'https://ncs.io/track/download/6a6e5e2e-9e9a-4e8a-8f1a-1d1c1c1c1c1c',
+                    audioSrc: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
                     coverSrc: 'https://i.ytimg.com/vi/BB2AkSuC2hM/maxresdefault.jpg',
                     isFavorite: false
                 }
@@ -2130,6 +2128,44 @@
             // Load first song
             if (app.songs.length > 0) {
                 loadSong(0);
+            }
+        }
+
+        // Setup Audio Context
+        function setupAudioContext() {
+            // Add event listeners for user interaction to initialize audio
+            const initAudioOnInteraction = () => {
+                if (!app.audioInitialized) {
+                    initAudioContext();
+                    app.audioInitialized = true;
+                    // Remove event listeners after initialization
+                    document.removeEventListener('click', initAudioOnInteraction);
+                    document.removeEventListener('touchstart', initAudioOnInteraction);
+                }
+            };
+            
+            document.addEventListener('click', initAudioOnInteraction);
+            document.addEventListener('touchstart', initAudioOnInteraction);
+        }
+
+        // Initialize Audio Context
+        function initAudioContext() {
+            try {
+                app.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                app.analyser = app.audioContext.createAnalyser();
+                app.analyser.fftSize = 256;
+                
+                // Connect audio player to analyser
+                app.source = app.audioContext.createMediaElementSource(elements.audioPlayer);
+                app.source.connect(app.analyser);
+                app.analyser.connect(app.audioContext.destination);
+                
+                // Setup visualizer
+                setupVisualizer();
+                
+                console.log('Audio context initialized successfully');
+            } catch (e) {
+                console.error('Error initializing audio context:', e);
             }
         }
 
@@ -2160,6 +2196,8 @@
             elements.audioPlayer.addEventListener('timeupdate', updateProgress);
             elements.audioPlayer.addEventListener('loadedmetadata', updateDuration);
             elements.audioPlayer.addEventListener('ended', handleSongEnd);
+            elements.audioPlayer.addEventListener('error', handleAudioError);
+            elements.audioPlayer.addEventListener('canplay', handleCanPlay);
             
             // Theme toggle
             elements.themeToggle.addEventListener('click', toggleTheme);
@@ -2388,30 +2426,14 @@
             }
         }
 
-        // Initialize Audio Context
-        function initAudioContext() {
-            try {
-                app.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                app.analyser = app.audioContext.createAnalyser();
-                app.analyser.fftSize = 256;
-                
-                // Connect audio player to analyser
-                app.source = app.audioContext.createMediaElementSource(elements.audioPlayer);
-                app.source.connect(app.analyser);
-                app.analyser.connect(app.audioContext.destination);
-            } catch (e) {
-                console.error('Error initializing audio context:', e);
-            }
-        }
-
         // Setup Visualizer
         function setupVisualizer() {
-            if (!app.visualizer) {
+            if (!app.visualizer && app.audioContext && app.analyser) {
                 app.visualizer = {
                     canvas: elements.visualizerCanvas,
                     ctx: elements.visualizerCanvas.getContext('2d'),
-                    bufferLength: app.analyser ? app.analyser.frequencyBinCount : 128,
-                    dataArray: new Uint8Array(app.analyser ? app.analyser.frequencyBinCount : 128)
+                    bufferLength: app.analyser.frequencyBinCount,
+                    dataArray: new Uint8Array(app.analyser.frequencyBinCount)
                 };
                 
                 // Set canvas size
@@ -2519,21 +2541,40 @@
 
         // Play Song
         function playSong() {
-            elements.audioPlayer.play()
-                .then(() => {
-                    app.isPlaying = true;
-                    elements.playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                    elements.fullscreenPlayPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
-                    
-                    // Resume audio context if suspended
-                    if (app.audioContext && app.audioContext.state === 'suspended') {
-                        app.audioContext.resume();
-                    }
-                })
-                .catch(error => {
-                    console.error('Error playing song:', error);
-                    showNotification('Error al reproducir la canción', 'error');
+            // Initialize audio context if not already initialized
+            if (!app.audioInitialized) {
+                initAudioContext();
+                app.audioInitialized = true;
+            }
+            
+            // Resume audio context if suspended
+            if (app.audioContext && app.audioContext.state === 'suspended') {
+                app.audioContext.resume().then(() => {
+                    elements.audioPlayer.play()
+                        .then(() => {
+                            app.isPlaying = true;
+                            elements.playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                            elements.fullscreenPlayPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        })
+                        .catch(error => {
+                            console.error('Error playing song:', error);
+                            showNotification('Error al reproducir la canción', 'error');
+                        });
+                }).catch(error => {
+                    console.error('Error resuming audio context:', error);
                 });
+            } else {
+                elements.audioPlayer.play()
+                    .then(() => {
+                        app.isPlaying = true;
+                        elements.playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        elements.fullscreenPlayPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                    })
+                    .catch(error => {
+                        console.error('Error playing song:', error);
+                        showNotification('Error al reproducir la canción', 'error');
+                    });
+            }
         }
 
         // Pause Song
@@ -2700,6 +2741,24 @@
                 playSong();
             } else { // Next song or stop
                 playNextSong();
+            }
+        }
+
+        // Handle Audio Error
+        function handleAudioError(e) {
+            console.error('Audio error:', e);
+            showNotification('Error al cargar el archivo de audio', 'error');
+            
+            // Try to play next song
+            playNextSong();
+        }
+
+        // Handle Can Play
+        function handleCanPlay() {
+            console.log('Audio can play');
+            // Update duration if available
+            if (elements.audioPlayer.duration) {
+                updateDuration();
             }
         }
 
