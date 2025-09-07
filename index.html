@@ -1042,6 +1042,48 @@
             transition: width 0.3s ease;
         }
 
+        /* File Upload Area */
+        .file-upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.25rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background-color: var(--surface-elevated);
+        }
+
+        .file-upload-area.dragover {
+            border-color: var(--primary);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        .file-upload-icon {
+            font-size: 3rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .file-upload-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
         /* Equalizer */
         .equalizer-container {
             margin-top: 1.25rem;
@@ -1750,19 +1792,34 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>Buscaremos automáticamente archivos de música en las carpetas comunes de tu dispositivo.</p>
-                <div class="scan-progress">
+                <p>Selecciona archivos de música de tu dispositivo para añadirlos a tu biblioteca.</p>
+                
+                <!-- File Upload Area -->
+                <div class="file-upload-area" id="fileUploadArea">
+                    <div class="file-upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-title">Selecciona tus archivos de música</div>
+                    <div class="file-upload-description">
+                        Haz clic aquí o arrastra tus archivos de música (MP3, WAV, FLAC, M4A, OGG, AAC)
+                    </div>
+                    <button class="btn btn-primary" id="selectFilesBtn">Seleccionar Archivos</button>
+                </div>
+                
+                <input type="file" id="fileInput" class="file-input" accept="audio/*" multiple>
+                
+                <div class="scan-progress" id="scanProgressContainer" style="display: none;">
                     <div class="progress-info">
-                        <span>Escaneando...</span>
+                        <span>Procesando archivos...</span>
                         <span id="scanProgressText">0%</span>
                     </div>
                     <div class="progress-bar-container">
                         <div class="progress-bar-fill" id="scanProgressBar"></div>
                     </div>
                 </div>
+                
                 <div class="form-actions">
                     <button class="btn btn-secondary" id="cancelScanMusic">Cancelar</button>
-                    <button class="btn btn-primary" id="startScanMusic">Comenzar Escaneo</button>
                 </div>
             </div>
         </div>
@@ -1931,14 +1988,19 @@
             saveCreatePlaylist: document.getElementById('saveCreatePlaylist'),
             playlistList: document.getElementById('playlistList'),
             
+            // Scan Music
             scanMusicModal: document.getElementById('scanMusicModal'),
             closeScanMusicModal: document.getElementById('closeScanMusicModal'),
             scanMusicBtn: document.getElementById('scanMusicBtn'),
-            startScanMusic: document.getElementById('startScanMusic'),
             cancelScanMusic: document.getElementById('cancelScanMusic'),
+            fileUploadArea: document.getElementById('fileUploadArea'),
+            selectFilesBtn: document.getElementById('selectFilesBtn'),
+            fileInput: document.getElementById('fileInput'),
+            scanProgressContainer: document.getElementById('scanProgressContainer'),
             scanProgressBar: document.getElementById('scanProgressBar'),
             scanProgressText: document.getElementById('scanProgressText'),
             
+            // Equalizer
             equalizerModal: document.getElementById('equalizerModal'),
             closeEqualizerModal: document.getElementById('closeEqualizerModal'),
             equalizerBtn: document.getElementById('equalizerBtn'),
@@ -2175,7 +2237,32 @@
                 elements.scanMusicModal.classList.remove('active');
             });
             
-            elements.startScanMusic.addEventListener('click', scanMusic);
+            // File upload
+            elements.selectFilesBtn.addEventListener('click', () => {
+                elements.fileInput.click();
+            });
+            
+            elements.fileUploadArea.addEventListener('click', () => {
+                elements.fileInput.click();
+            });
+            
+            elements.fileInput.addEventListener('change', handleFileSelect);
+            
+            // Drag and drop
+            elements.fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                elements.fileUploadArea.classList.add('dragover');
+            });
+            
+            elements.fileUploadArea.addEventListener('dragleave', () => {
+                elements.fileUploadArea.classList.remove('dragover');
+            });
+            
+            elements.fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                elements.fileUploadArea.classList.remove('dragover');
+                handleFiles(e.dataTransfer.files);
+            });
             
             // Equalizer
             elements.equalizerBtn.addEventListener('click', () => {
@@ -3342,68 +3429,49 @@
             });
         }
 
-        // Scan Music
-        async function scanMusic() {
-            // Check if File System Access API is available
-            if (!('showDirectoryPicker' in window)) {
-                showNotification('Tu navegador no soporta la API de acceso al sistema de archivos', 'error');
+        // Handle File Select
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                handleFiles(files);
+            }
+        }
+
+        // Handle Files
+        async function handleFiles(files) {
+            // Show progress
+            elements.scanProgressContainer.style.display = 'block';
+            elements.scanProgressBar.style.width = '0%';
+            elements.scanProgressText.textContent = '0%';
+            
+            // Filter audio files
+            const audioExtensions = ['.mp3', '.wav', '.flac', '.m4a', '.ogg', '.aac'];
+            const audioFiles = Array.from(files).filter(file => {
+                const name = file.name.toLowerCase();
+                return audioExtensions.some(ext => name.endsWith(ext));
+            });
+            
+            if (audioFiles.length === 0) {
+                showNotification('No se encontraron archivos de audio válidos', 'error');
+                elements.scanProgressContainer.style.display = 'none';
                 return;
             }
             
             try {
-                // Show directory picker
-                const dirHandle = await window.showDirectoryPicker();
-                
-                // Start scanning
-                elements.startScanMusic.disabled = true;
-                elements.scanProgressBar.style.width = '0%';
-                elements.scanProgressText.textContent = '0%';
-                
-                // Scan for audio files
-                const audioFiles = [];
-                const audioExtensions = ['.mp3', '.wav', '.flac', '.m4a', '.ogg', '.aac'];
-                
-                // Recursive function to scan directory
-                const scanDirectory = async (dirHandle, path = '') => {
-                    for await (const entry of dirHandle.values()) {
-                        if (entry.kind === 'file') {
-                            const name = entry.name.toLowerCase();
-                            
-                            // Check if file has audio extension
-                            if (audioExtensions.some(ext => name.endsWith(ext))) {
-                                const file = await entry.getFile();
-                                audioFiles.push({
-                                    file: file,
-                                    path: path + entry.name
-                                });
-                            }
-                        } else if (entry.kind === 'directory') {
-                            // Recursively scan subdirectories
-                            await scanDirectory(entry, path + entry.name + '/');
-                        }
-                    }
-                };
-                
-                // Start scanning
-                await scanDirectory(dirHandle);
-                
-                // Update progress
-                let processed = 0;
-                elements.scanProgressBar.style.width = '50%';
-                elements.scanProgressText.textContent = '50%';
-                
                 // Process audio files
-                for (const audioFile of audioFiles) {
-                    // Extract metadata (simplified for demo)
+                for (let i = 0; i < audioFiles.length; i++) {
+                    const file = audioFiles[i];
+                    
+                    // Create song object
                     const newSong = {
-                        id: Date.now() + processed,
-                        title: audioFile.file.name.replace(/\.[^/.]+$/, ""),
+                        id: Date.now() + i,
+                        title: file.name.replace(/\.[^/.]+$/, ""),
                         artist: 'Artista desconocido',
                         album: 'Álbum desconocido',
                         genre: 'Desconocido',
                         year: new Date().getFullYear(),
                         duration: 0, // Will be updated when loaded
-                        audioSrc: URL.createObjectURL(audioFile.file),
+                        audioSrc: URL.createObjectURL(file),
                         coverSrc: 'https://i.ytimg.com/vi/yJg-Y5byMMw/maxresdefault.jpg',
                         isFavorite: false
                     };
@@ -3412,32 +3480,29 @@
                     app.songs.push(newSong);
                     
                     // Update progress
-                    processed++;
-                    const progress = 50 + (processed / audioFiles.length) * 50;
+                    const progress = ((i + 1) / audioFiles.length) * 100;
                     elements.scanProgressBar.style.width = `${progress}%`;
                     elements.scanProgressText.textContent = `${Math.round(progress)}%`;
                 }
                 
                 // Complete
-                elements.scanProgressBar.style.width = '100%';
-                elements.scanProgressText.textContent = '100%';
-                
-                // Show success message
-                showNotification(`Se encontraron ${audioFiles.length} archivos de música`);
+                showNotification(`Se añadieron ${audioFiles.length} archivos de música`);
                 
                 // Refresh current view
                 renderView(app.currentView);
                 
-                // Reset button
-                setTimeout(() => {
-                    elements.startScanMusic.disabled = false;
-                    elements.scanMusicModal.classList.remove('active');
-                }, 1500);
+                // Reset file input
+                elements.fileInput.value = '';
                 
             } catch (error) {
-                console.error('Error scanning music:', error);
-                showNotification('Error al escanear música', 'error');
-                elements.startScanMusic.disabled = false;
+                console.error('Error processing files:', error);
+                showNotification('Error al procesar los archivos', 'error');
+            } finally {
+                // Hide progress after delay
+                setTimeout(() => {
+                    elements.scanProgressContainer.style.display = 'none';
+                    elements.scanMusicModal.classList.remove('active');
+                }, 1500);
             }
         }
 
