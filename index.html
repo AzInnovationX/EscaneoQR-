@@ -17,6 +17,7 @@
             --success-color: #10b981;
             --dark-color: #1e293b;
             --light-bg: #f8fafc;
+            --url-color: #8b5cf6;
         }
         
         body {
@@ -178,6 +179,15 @@
             gap: 0.5rem;
         }
         
+        .result-type {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
         .result-content {
             background-color: white;
             padding: 1rem;
@@ -185,10 +195,17 @@
             font-family: 'Courier New', monospace;
             word-break: break-all;
             border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        
+        .url-content {
+            color: var(--url-color);
+            font-weight: 500;
         }
         
         .actions {
             display: flex;
+            flex-wrap: wrap;
             gap: 1rem;
             margin-top: 1rem;
         }
@@ -199,6 +216,9 @@
             font-weight: 500;
             border: none;
             transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
         
         .btn-copy {
@@ -217,6 +237,15 @@
         
         .btn-new:hover {
             background-color: #475569;
+        }
+        
+        .btn-open {
+            background-color: var(--url-color);
+            color: white;
+        }
+        
+        .btn-open:hover {
+            background-color: #7c3aed;
         }
         
         .notification {
@@ -294,6 +323,11 @@
             .actions {
                 flex-direction: column;
             }
+            
+            .btn-action {
+                width: 100%;
+                justify-content: center;
+            }
         }
     </style>
 </head>
@@ -329,10 +363,16 @@
             
             <div id="result-container" class="result-container">
                 <h3><i class="fas fa-check-circle"></i> Código Detectado</h3>
+                <div id="result-type" class="result-type">
+                    <i class="fas fa-info-circle"></i> <span id="type-text">Tipo de contenido</span>
+                </div>
                 <div id="result-content" class="result-content"></div>
                 <div class="actions">
                     <button id="copy-btn" class="btn btn-action btn-copy">
                         <i class="fas fa-copy"></i> Copiar
+                    </button>
+                    <button id="open-btn" class="btn btn-action btn-open" style="display: none;">
+                        <i class="fas fa-external-link-alt"></i> Abrir URL
                     </button>
                     <button id="new-scan-btn" class="btn btn-action btn-new">
                         <i class="fas fa-redo"></i> Nuevo Escaneo
@@ -348,7 +388,7 @@
             </div>
             
             <div class="footer">
-                <p>Escaneo QR y de Barras &copy; 2023 - Tecnología de escaneo avanzada</p>
+                <p>Az InnovationX © 2025 | Escaneo avanzado de códigos QR y de barras</p>
             </div>
         </div>
     </div>
@@ -371,7 +411,10 @@
             const stopBtn = document.getElementById('stop-btn');
             const resultContainer = document.getElementById('result-container');
             const resultContent = document.getElementById('result-content');
+            const resultType = document.getElementById('result-type');
+            const typeText = document.getElementById('type-text');
             const copyBtn = document.getElementById('copy-btn');
+            const openBtn = document.getElementById('open-btn');
             const newScanBtn = document.getElementById('new-scan-btn');
             const notification = document.getElementById('notification');
             const errorMessage = document.getElementById('error-message');
@@ -384,6 +427,7 @@
             let stream = null;
             let animationFrameId = null;
             let qrLibraryLoaded = false;
+            let currentScanResult = '';
             
             // Verificar si la librería jsQR está cargada
             function checkQRLibrary() {
@@ -405,6 +449,70 @@
                     deviceInfo.innerHTML = '<i class="fas fa-mobile-alt"></i> Dispositivo iOS detectado';
                 } else {
                     deviceInfo.innerHTML = '<i class="fas fa-desktop"></i> Computadora de escritorio detectada';
+                }
+            }
+            
+            // Validar si es una URL
+            function isValidUrl(string) {
+                try {
+                    // Intentar crear un objeto URL
+                    new URL(string);
+                    return true;
+                } catch (_) {
+                    // Si falla, intentar agregar http:// para URLs sin protocolo
+                    try {
+                        new URL('http://' + string);
+                        return true;
+                    } catch (_) {
+                        return false;
+                    }
+                }
+            }
+            
+            // Determinar tipo de contenido
+            function getContentType(data) {
+                if (isValidUrl(data)) {
+                    return {
+                        type: 'url',
+                        text: 'URL detectada',
+                        icon: 'fas fa-link'
+                    };
+                } else if (data.includes('@') && data.includes('.')) {
+                    return {
+                        type: 'email',
+                        text: 'Correo electrónico detectado',
+                        icon: 'fas fa-envelope'
+                    };
+                } else if (data.startsWith('tel:')) {
+                    return {
+                        type: 'phone',
+                        text: 'Número de teléfono detectado',
+                        icon: 'fas fa-phone'
+                    };
+                } else if (data.startsWith('wifi:')) {
+                    return {
+                        type: 'wifi',
+                        text: 'Configuración WiFi detectada',
+                        icon: 'fas fa-wifi'
+                    };
+                } else if (data.startsWith('BEGIN:VCARD')) {
+                    return {
+                        type: 'contact',
+                        text: 'Contacto detectado',
+                        icon: 'fas fa-address-card'
+                    };
+                } else if (data.length > 50) {
+                    return {
+                        type: 'text',
+                        text: 'Texto largo detectado',
+                        icon: 'fas fa-align-left'
+                    };
+                } else {
+                    return {
+                        type: 'text',
+                        text: 'Texto detectado',
+                        icon: 'fas fa-font'
+                    };
                 }
             }
             
@@ -504,7 +612,24 @@
             // Manejar resultado del escaneo
             function handleScanResult(data) {
                 stopScanning();
-                resultContent.textContent = data;
+                currentScanResult = data;
+                
+                // Determinar tipo de contenido
+                const contentType = getContentType(data);
+                
+                // Actualizar tipo de contenido
+                typeText.textContent = contentType.text;
+                resultType.innerHTML = `<i class="${contentType.icon}"></i> <span id="type-text">${contentType.text}</span>`;
+                
+                // Actualizar contenido
+                if (contentType.type === 'url') {
+                    resultContent.innerHTML = `<a href="#" class="url-content">${data}</a>`;
+                    openBtn.style.display = 'flex';
+                } else {
+                    resultContent.textContent = data;
+                    openBtn.style.display = 'none';
+                }
+                
                 resultContainer.style.display = 'block';
                 
                 // Vibración en dispositivos móviles
@@ -513,10 +638,25 @@
                 }
             }
             
+            // Abrir URL
+            function openUrl() {
+                if (!currentScanResult) return;
+                
+                let url = currentScanResult;
+                
+                // Si la URL no tiene protocolo, agregar http://
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'http://' + url;
+                }
+                
+                // Abrir en una nueva pestaña
+                window.open(url, '_blank');
+            }
+            
             // Copiar al portapapeles
             async function copyToClipboard() {
                 try {
-                    await navigator.clipboard.writeText(resultContent.textContent);
+                    await navigator.clipboard.writeText(currentScanResult);
                     showNotification();
                 } catch (err) {
                     console.error('Error al copiar:', err);
@@ -542,6 +682,7 @@
             startBtn.addEventListener('click', startScanning);
             stopBtn.addEventListener('click', stopScanning);
             copyBtn.addEventListener('click', copyToClipboard);
+            openBtn.addEventListener('click', openUrl);
             newScanBtn.addEventListener('click', () => {
                 resultContainer.style.display = 'none';
                 startScanning();
