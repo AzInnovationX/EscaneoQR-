@@ -2,102 +2,57 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#6366f1">
-    <title>ScanPro - Escáner Profesional QR & Barras</title>
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ScanPro - Escáner QR Premium</title>
     
-    <!-- CDN Libraries -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #8b5cf6;
-            --success: #10b981;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-        }
-
-        [data-theme="dark"] {
-            --dark: #f8fafc;
-            --light: #0f172a;
-            --glass-bg: rgba(0, 0, 0, 0.3);
-            --glass-border: rgba(255, 255, 255, 0.1);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            color: var(--dark);
-            transition: all 0.3s ease;
+            overflow-x: hidden;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         [data-theme="dark"] body {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
         }
 
-        /* Particles Background */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            animation: float 15s infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
-        }
-
-        /* Glassmorphism Container */
         .app-container {
-            position: relative;
-            z-index: 1;
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 1rem;
         }
 
         .glass-card {
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(20px);
-            border-radius: 24px;
-            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            padding: 2rem;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            padding: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         /* Header */
@@ -105,71 +60,89 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--glass-border);
+            margin-bottom: 1.5rem;
+            color: white;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            color: white;
+            gap: 0.75rem;
         }
 
         .logo-icon {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+            font-size: 1.3rem;
+            color: white;
         }
 
         .logo-text h1 {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             margin: 0;
         }
 
         .logo-text p {
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             opacity: 0.9;
             margin: 0;
         }
 
-        /* Theme Toggle */
         .theme-toggle {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 50px;
-            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 10px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 1rem 0.5rem;
+            text-align: center;
             color: white;
         }
 
-        .theme-toggle:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: block;
         }
 
-        /* Main Content Grid */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
+        .stat-label {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
         }
 
-        /* Scanner Section */
-        .scanner-section {
-            position: relative;
-        }
-
+        /* Video Container */
         #video-container {
             position: relative;
             width: 100%;
@@ -177,7 +150,7 @@
             border-radius: 16px;
             overflow: hidden;
             background: #000;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1rem;
         }
 
         #video {
@@ -197,8 +170,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 60%;
-            height: 60%;
+            width: 70%;
+            height: 70%;
             border: 3px solid var(--success);
             border-radius: 12px;
             animation: pulse 2s ease-in-out infinite;
@@ -206,7 +179,7 @@
 
         @keyframes pulse {
             0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            50% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            50% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
         }
 
         .scan-line {
@@ -218,14 +191,14 @@
         }
 
         @keyframes scanline {
-            0% { top: 20%; }
-            100% { top: 80%; }
+            0% { top: 15%; }
+            100% { top: 85%; }
         }
 
         .corner {
             position: absolute;
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             border: 4px solid var(--success);
         }
 
@@ -236,97 +209,59 @@
 
         /* Controls */
         .scanner-controls {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
-        .btn-primary {
-            flex: 1;
+        .btn-scan {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             color: white;
             padding: 1rem;
             border-radius: 12px;
             font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
-            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
+            transition: all 0.3s;
+            touch-action: manipulation;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(99, 102, 241, 0.4);
+        .btn-scan:active {
+            transform: scale(0.97);
         }
 
-        .btn-primary:disabled {
+        .btn-scan:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
         .btn-secondary {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: white;
-        }
-
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .stat-card {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-        }
-
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            display: block;
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            opacity: 0.8;
-            margin-top: 0.25rem;
+            background: rgba(255, 255, 255, 0.2);
         }
 
         /* Result Section */
         .result-section {
             background: white;
             border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1.25rem;
             display: none;
-            animation: slideIn 0.4s ease;
+            animation: slideUp 0.3s ease;
         }
 
         [data-theme="dark"] .result-section {
-            background: rgba(30, 41, 59, 0.8);
+            background: rgba(30, 41, 59, 0.9);
             color: white;
         }
 
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .result-header {
@@ -335,47 +270,83 @@
             gap: 0.5rem;
             color: var(--success);
             margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
         }
 
-        .result-type {
-            display: inline-block;
-            background: var(--glass-bg);
-            padding: 0.25rem 0.75rem;
+        .security-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.35rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .security-safe { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .security-warning { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .security-danger { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
+        .result-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0.35rem 0.85rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        [data-theme="dark"] .result-type {
+            background: rgba(99, 102, 241, 0.2);
         }
 
         .result-content {
-            background: var(--light);
+            background: #f8fafc;
             padding: 1rem;
-            border-radius: 8px;
+            border-radius: 10px;
             word-break: break-all;
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
             margin-bottom: 1rem;
             border-left: 4px solid var(--primary);
+            max-height: 150px;
+            overflow-y: auto;
         }
 
         [data-theme="dark"] .result-content {
             background: rgba(15, 23, 42, 0.5);
+            color: #e2e8f0;
         }
 
         .result-actions {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 0.5rem;
-            flex-wrap: wrap;
         }
 
         .btn-action {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.75rem;
+            border-radius: 10px;
             border: none;
             cursor: pointer;
             font-weight: 500;
-            transition: all 0.2s ease;
+            font-size: 0.85rem;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 0.5rem;
+            transition: all 0.2s;
+            touch-action: manipulation;
+        }
+
+        .btn-action:active {
+            transform: scale(0.97);
         }
 
         .btn-copy { background: var(--primary); color: white; }
@@ -383,16 +354,7 @@
         .btn-share { background: var(--success); color: white; }
         .btn-save { background: var(--warning); color: white; }
 
-        .btn-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        /* History Section */
-        .history-section {
-            margin-top: 2rem;
-        }
-
+        /* History */
         .history-header {
             display: flex;
             justify-content: space-between;
@@ -401,58 +363,75 @@
             color: white;
         }
 
-        .history-controls {
-            display: flex;
-            gap: 0.5rem;
+        .history-header h3 {
+            font-size: 1.1rem;
+            margin: 0;
         }
 
         .search-box {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.65rem 1rem;
             color: white;
-            width: 250px;
+            width: 100%;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
         }
 
         .search-box::placeholder {
             color: rgba(255, 255, 255, 0.6);
         }
 
+        .btn-clear {
+            background: rgba(239, 68, 68, 0.2);
+            color: white;
+            border: none;
+            padding: 0.65rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            width: 100%;
+            margin-bottom: 0.75rem;
+            touch-action: manipulation;
+        }
+
+        .btn-clear:active {
+            transform: scale(0.97);
+        }
+
         .history-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            max-height: 400px;
+            max-height: 300px;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .history-item {
-            background: var(--glass-bg);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border);
             border-radius: 12px;
             padding: 1rem;
+            margin-bottom: 0.75rem;
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s ease;
             cursor: pointer;
+            touch-action: manipulation;
         }
 
-        .history-item:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        .history-item:active {
+            transform: scale(0.98);
         }
 
         .history-content {
             flex: 1;
+            min-width: 0;
         }
 
         .history-text {
             font-size: 0.9rem;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.35rem;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -460,66 +439,99 @@
 
         .history-meta {
             font-size: 0.75rem;
-            opacity: 0.7;
-            display: flex;
-            gap: 1rem;
+            opacity: 0.8;
         }
 
         .history-actions {
             display: flex;
             gap: 0.5rem;
+            margin-left: 0.75rem;
         }
 
         .btn-icon {
-            background: none;
+            background: rgba(255, 255, 255, 0.2);
             border: none;
             color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 6px;
-            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            touch-action: manipulation;
         }
 
-        .btn-icon:hover {
-            background: rgba(255, 255, 255, 0.1);
+        .btn-icon:active {
+            transform: scale(0.9);
         }
 
-        /* Toast Notifications */
+        .empty-state {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 2rem 1rem;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        /* Toast */
         .toast-container {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
+            width: calc(100% - 2rem);
+            max-width: 400px;
         }
 
         .toast {
             background: white;
             border-radius: 12px;
-            padding: 1rem 1.5rem;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            padding: 1rem 1.25rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
             animation: toastIn 0.3s ease;
-            min-width: 300px;
         }
 
         @keyframes toastIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .toast-success { border-left: 4px solid var(--success); }
         .toast-error { border-left: 4px solid var(--danger); }
         .toast-warning { border-left: 4px solid var(--warning); }
 
-        /* Loading Spinner */
+        .toast-message {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            z-index: 10;
+        }
+
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border: 4px solid rgba(255, 255, 255, 0.3);
             border-top-color: white;
             border-radius: 50%;
@@ -530,46 +542,23 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .search-box {
-                width: 100%;
-            }
-
-            .history-controls {
-                flex-direction: column;
-                width: 100%;
-            }
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
 
-        /* Security Badge */
-        .security-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
         }
 
-        .security-safe { background: rgba(16, 185, 129, 0.2); color: var(--success); }
-        .security-warning { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .security-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
-    <!-- Particles Background -->
-    <div class="particles" id="particles"></div>
-
     <div class="app-container">
         <!-- Header -->
         <div class="glass-card">
@@ -580,10 +569,10 @@
                     </div>
                     <div class="logo-text">
                         <h1>ScanPro</h1>
-                        <p>Escáner Profesional Premium</p>
+                        <p>Escáner Profesional</p>
                     </div>
                 </div>
-                <button class="theme-toggle" id="themeToggle">
+                <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema">
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
@@ -591,99 +580,96 @@
             <!-- Stats -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <i class="fas fa-qrcode" style="font-size: 1.5rem; opacity: 0.8;"></i>
                     <span class="stat-value" id="totalScans">0</span>
-                    <span class="stat-label">Total Escaneos</span>
+                    <span class="stat-label">Escaneos</span>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-check-circle" style="font-size: 1.5rem; opacity: 0.8;"></i>
                     <span class="stat-value" id="successScans">0</span>
                     <span class="stat-label">Exitosos</span>
                 </div>
                 <div class="stat-card">
-                    <i class="fas fa-clock" style="font-size: 1.5rem; opacity: 0.8;"></i>
                     <span class="stat-value" id="avgTime">0ms</span>
-                    <span class="stat-label">Tiempo Promedio</span>
+                    <span class="stat-label">Promedio</span>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="content-grid">
-            <!-- Scanner -->
-            <div class="glass-card scanner-section">
-                <div id="video-container">
-                    <video id="video" autoplay playsinline muted></video>
-                    <canvas id="canvas" style="display: none;"></canvas>
-                    <div class="scan-overlay">
-                        <div class="scan-frame">
-                            <div class="corner corner-tl"></div>
-                            <div class="corner corner-tr"></div>
-                            <div class="corner corner-bl"></div>
-                            <div class="corner corner-br"></div>
-                        </div>
-                        <div class="scan-line"></div>
+        <!-- Scanner -->
+        <div class="glass-card">
+            <div id="video-container">
+                <video id="video" autoplay playsinline muted></video>
+                <canvas id="canvas"></canvas>
+                <div class="scan-overlay">
+                    <div class="scan-frame">
+                        <div class="corner corner-tl"></div>
+                        <div class="corner corner-tr"></div>
+                        <div class="corner corner-bl"></div>
+                        <div class="corner corner-br"></div>
                     </div>
+                    <div class="scan-line"></div>
                 </div>
-
-                <div class="scanner-controls">
-                    <button class="btn-primary" id="startBtn">
-                        <i class="fas fa-play"></i>
-                        <span>Iniciar Escaneo</span>
-                    </button>
-                    <button class="btn-primary btn-secondary" id="stopBtn" disabled>
-                        <i class="fas fa-stop"></i>
-                        <span>Detener</span>
-                    </button>
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="spinner"></div>
                 </div>
             </div>
 
-            <!-- Result -->
-            <div class="result-section" id="resultSection">
-                <div class="result-header">
-                    <i class="fas fa-check-circle" style="font-size: 1.5rem;"></i>
-                    <h3 style="margin: 0;">Código Detectado</h3>
-                </div>
-                
-                <div id="securityBadge"></div>
-                <div class="result-type" id="resultType">
-                    <i class="fas fa-info-circle"></i>
-                    <span id="typeText">Tipo de código</span>
-                </div>
-                
-                <div class="result-content" id="resultContent"></div>
+            <div class="scanner-controls">
+                <button class="btn-scan" id="startBtn">
+                    <i class="fas fa-play"></i>
+                    <span>Iniciar</span>
+                </button>
+                <button class="btn-scan btn-secondary" id="stopBtn" disabled>
+                    <i class="fas fa-stop"></i>
+                    <span>Detener</span>
+                </button>
+            </div>
+        </div>
 
-                <div class="result-actions">
-                    <button class="btn-action btn-copy" id="copyBtn">
-                        <i class="fas fa-copy"></i> Copiar
-                    </button>
-                    <button class="btn-action btn-open" id="openBtn" style="display: none;">
-                        <i class="fas fa-external-link-alt"></i> Abrir
-                    </button>
-                    <button class="btn-action btn-share" id="shareBtn">
-                        <i class="fas fa-share-alt"></i> Compartir
-                    </button>
-                    <button class="btn-action btn-save" id="saveBtn">
-                        <i class="fas fa-save"></i> Guardar
-                    </button>
-                </div>
+        <!-- Result -->
+        <div class="glass-card result-section" id="resultSection">
+            <div class="result-header">
+                <i class="fas fa-check-circle"></i>
+                <span>Código Detectado</span>
+            </div>
+            
+            <div id="securityBadge"></div>
+            <div class="result-type" id="resultType">
+                <i class="fas fa-info-circle"></i>
+                <span id="typeText">Tipo</span>
+            </div>
+            
+            <div class="result-content" id="resultContent"></div>
+
+            <div class="result-actions">
+                <button class="btn-action btn-copy" id="copyBtn">
+                    <i class="fas fa-copy"></i> Copiar
+                </button>
+                <button class="btn-action btn-open" id="openBtn" style="display: none;">
+                    <i class="fas fa-external-link-alt"></i> Abrir
+                </button>
+                <button class="btn-action btn-share" id="shareBtn">
+                    <i class="fas fa-share-alt"></i> Compartir
+                </button>
+                <button class="btn-action btn-save" id="saveBtn">
+                    <i class="fas fa-bookmark"></i> Guardar
+                </button>
             </div>
         </div>
 
         <!-- History -->
-        <div class="glass-card history-section">
+        <div class="glass-card">
             <div class="history-header">
-                <h3><i class="fas fa-history"></i> Historial de Escaneos</h3>
-                <div class="history-controls">
-                    <input type="text" class="search-box" id="searchBox" placeholder="Buscar...">
-                    <button class="btn-primary btn-secondary" id="clearHistory" style="padding: 0.5rem 1rem;">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
+                <h3><i class="fas fa-history"></i> Historial</h3>
             </div>
+            
+            <input type="text" class="search-box" id="searchBox" placeholder="Buscar en historial...">
+            <button class="btn-clear" id="clearHistory">
+                <i class="fas fa-trash"></i> Limpiar Historial
+            </button>
+            
             <div class="history-list" id="historyList">
-                <div style="text-align: center; color: rgba(255,255,255,0.6); padding: 2rem;">
-                    <i class="fas fa-inbox" style="font-size: 3rem; opacity: 0.5;"></i>
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
                     <p>No hay escaneos aún</p>
                 </div>
             </div>
@@ -693,166 +679,619 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
-    
     <script>
-        // App State
+        // Estado de la aplicación
         const state = {
             scanning: false,
             stream: null,
             history: [],
-            stats: {
-                total: 0,
-                success: 0,
-                times: []
-            },
+            stats: { total: 0, success: 0, times: [] },
             currentResult: null,
-            theme: 'light'
+            theme: localStorage.getItem('theme') || 'light',
+            animationFrame: null
         };
 
-        // DOM Elements
+        // Elementos del DOM
+        const $ = id => document.getElementById(id);
         const elements = {
-            video: document.getElementById('video'),
-            canvas: document.getElementById('canvas'),
-            startBtn: document.getElementById('startBtn'),
-            stopBtn: document.getElementById('stopBtn'),
-            resultSection: document.getElementById('resultSection'),
-            resultContent: document.getElementById('resultContent'),
-            resultType: document.getElementById('resultType'),
-            typeText: document.getElementById('typeText'),
-            securityBadge: document.getElementById('securityBadge'),
-            copyBtn: document.getElementById('copyBtn'),
-            openBtn: document.getElementById('openBtn'),
-            shareBtn: document.getElementById('shareBtn'),
-            saveBtn: document.getElementById('saveBtn'),
-            historyList: document.getElementById('historyList'),
-            searchBox: document.getElementById('searchBox'),
-            clearHistory: document.getElementById('clearHistory'),
-            themeToggle: document.getElementById('themeToggle'),
-            totalScans: document.getElementById('totalScans'),
-            successScans: document.getElementById('successScans'),
-            avgTime: document.getElementById('avgTime')
+            video: $('video'),
+            canvas: $('canvas'),
+            startBtn: $('startBtn'),
+            stopBtn: $('stopBtn'),
+            resultSection: $('resultSection'),
+            resultContent: $('resultContent'),
+            resultType: $('resultType'),
+            typeText: $('typeText'),
+            securityBadge: $('securityBadge'),
+            copyBtn: $('copyBtn'),
+            openBtn: $('openBtn'),
+            shareBtn: $('shareBtn'),
+            saveBtn: $('saveBtn'),
+            historyList: $('historyList'),
+            searchBox: $('searchBox'),
+            clearHistory: $('clearHistory'),
+            themeToggle: $('themeToggle'),
+            totalScans: $('totalScans'),
+            successScans: $('successScans'),
+            avgTime: $('avgTime'),
+            loadingOverlay: $('loadingOverlay')
         };
 
-        // Initialize Particles
-        function createParticles() {
-            const container = document.getElementById('particles');
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 15 + 's';
-                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-                container.appendChild(particle);
-            }
-        }
-
-        // Toast Notification
+        // Toast notification
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `
                 <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
+                <span class="toast-message">${message}</span>
             `;
-            document.getElementById('toastContainer').appendChild(toast);
+            $('toastContainer').appendChild(toast);
             
             setTimeout(() => {
                 toast.style.animation = 'toastIn 0.3s ease reverse';
                 setTimeout(() => toast.remove(), 300);
             }, 3000);
+
+            // Vibración en móviles
+            if (navigator.vibrate) {
+                navigator.vibrate(type === 'success' ? 100 : type === 'error' ? [100, 50, 100] : 50);
+            }
         }
 
-        // Security Check
+        // Verificación de seguridad de URL
         function checkUrlSecurity(url) {
-            const dangerousDomains = ['bit.ly', 'tinyurl.com', 'goo.gl'];
-            const suspicious = ['login', 'verify', 'secure', 'account', 'password'];
+            const dangerous = ['bit.ly', 'tinyurl', 'goo.gl', 't.co'];
+            const suspicious = ['login', 'verify', 'password', 'account', 'signin'];
             
             try {
                 const urlObj = new URL(url.startsWith('http') ? url : 'http://' + url);
-                const domain = urlObj.hostname;
+                const domain = urlObj.hostname.toLowerCase();
+                const path = urlObj.pathname.toLowerCase() + urlObj.search.toLowerCase();
                 
-                if (dangerousDomains.some(d => domain.includes(d))) {
-                    return { level: 'warning', text: 'URL acortada - Precaución' };
+                // Verificar dominios peligrosos
+                if (dangerous.some(d => domain.includes(d))) {
+                    return { level: 'warning', text: 'URL acortada', icon: 'exclamation-triangle' };
                 }
                 
-                if (suspicious.some(s => url.toLowerCase().includes(s))) {
-                    return { level: 'warning', text: 'URL sospechosa - Verificar' };
+                // Verificar términos sospechosos
+                if (suspicious.some(s => path.includes(s))) {
+                    return { level: 'warning', text: 'URL sospechosa', icon: 'exclamation-triangle' };
                 }
                 
-                return { level: 'safe', text: 'URL segura' };
+                return { level: 'safe', text: 'URL segura', icon: 'shield-alt' };
             } catch {
-                return { level: 'safe', text: 'Texto seguro' };
+                return { level: 'safe', text: 'Texto seguro', icon: 'check' };
             }
         }
 
-        // Detect Content Type
+        // Detectar tipo de contenido
         function detectContentType(data) {
             if (/^https?:\/\//i.test(data)) {
-                return { type: 'url', icon: 'link', label: 'URL' };
+                return { type: 'url', icon: 'link', label: 'URL Detectada' };
             } else if (/^mailto:/i.test(data)) {
-                return { type: 'email', icon: 'envelope', label: 'Email' };
+                return { type: 'email', icon: 'envelope', label: 'Email Detectado' };
             } else if (/^tel:/i.test(data)) {
-                return { type: 'phone', icon: 'phone', label: 'Teléfono' };
+                return { type: 'phone', icon: 'phone', label: 'Teléfono Detectado' };
             } else if (/^wifi:/i.test(data)) {
-                return { type: 'wifi', icon: 'wifi', label: 'WiFi' };
+                return { type: 'wifi', icon: 'wifi', label: 'WiFi Detectado' };
             } else if (/^BEGIN:VCARD/i.test(data)) {
-                return { type: 'contact', icon: 'address-card', label: 'Contacto' };
+                return { type: 'contact', icon: 'address-card', label: 'Contacto Detectado' };
+            } else if (/^geo:/i.test(data)) {
+                return { type: 'location', icon: 'map-marker-alt', label: 'Ubicación Detectada' };
             } else {
-                return { type: 'text', icon: 'font', label: 'Texto' };
+                return { type: 'text', icon: 'font', label: 'Texto Detectado' };
             }
         }
 
-        // Start Scanning
+        // Iniciar escaneo
         async function startScanning() {
             if (!window.jsQR) {
-                showToast('Error: Librería jsQR no cargada', 'error');
+                showToast('Error: Librería no cargada', 'error');
                 return;
             }
 
+            elements.loadingOverlay.style.display = 'flex';
+
             try {
-                state.stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-                });
-                
-                elements.video.srcObject = state.stream;
-                
-                elements.video.onloadedmetadata = () => {
-                    elements.canvas.width = elements.video.videoWidth;
-                    elements.canvas.height = elements.video.videoHeight;
-                    state.scanning = true;
-                    elements.startBtn.disabled = true;
-                    elements.stopBtn.disabled = false;
-                    
-                    scanFrame();
-                    showToast('Escaneo iniciado', 'success');
+                // Solicitar permisos de cámara con preferencia por cámara trasera
+                const constraints = {
+                    video: {
+                        facingMode: { ideal: 'environment' },
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    }
                 };
+
+                state.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                elements.video.srcObject = state.stream;
+
+                // Esperar a que el video esté listo
+                await new Promise((resolve) => {
+                    elements.video.onloadedmetadata = () => {
+                        elements.video.play();
+                        resolve();
+                    };
+                });
+
+                // Configurar canvas
+                const videoWidth = elements.video.videoWidth;
+                const videoHeight = elements.video.videoHeight;
+                elements.canvas.width = videoWidth;
+                elements.canvas.height = videoHeight;
+
+                state.scanning = true;
+                elements.startBtn.disabled = true;
+                elements.stopBtn.disabled = false;
+                elements.loadingOverlay.style.display = 'none';
+
+                showToast('Escaneo iniciado', 'success');
+                scanFrame();
+
             } catch (err) {
-                showToast('Error al acceder a la cámara', 'error');
-                console.error(err);
+                elements.loadingOverlay.style.display = 'none';
+                console.error('Error al acceder a la cámara:', err);
+                
+                let errorMsg = 'Error al acceder a la cámara';
+                if (err.name === 'NotAllowedError') {
+                    errorMsg = 'Permiso de cámara denegado';
+                } else if (err.name === 'NotFoundError') {
+                    errorMsg = 'No se encontró cámara';
+                } else if (err.name === 'NotReadableError') {
+                    errorMsg = 'Cámara en uso por otra app';
+                }
+                
+                showToast(errorMsg, 'error');
             }
         }
 
-        // Stop Scanning
+        // Detener escaneo
         function stopScanning() {
             state.scanning = false;
+            
+            if (state.animationFrame) {
+                cancelAnimationFrame(state.animationFrame);
+                state.animationFrame = null;
+            }
+            
             if (state.stream) {
                 state.stream.getTracks().forEach(track => track.stop());
                 state.stream = null;
             }
+            
+            elements.video.srcObject = null;
             elements.startBtn.disabled = false;
             elements.stopBtn.disabled = true;
+            
             showToast('Escaneo detenido', 'warning');
         }
 
-        // Scan Frame
+        // Escanear frame por frame
         function scanFrame() {
             if (!state.scanning) return;
 
-            const ctx = elements.canvas.getContext('2d');
+            const ctx = elements.canvas.getContext('2d', { willReadFrequently: true });
             
             if (elements.video.readyState === elements.video.HAVE_ENOUGH_DATA) {
-                ctx.drawImage(elements.video, 0, 0, elements.canvas.width, elements.canvas.height);
-                const imageData = ctx.getImage
+                try {
+                    ctx.drawImage(elements.video, 0, 0, elements.canvas.width, elements.canvas.height);
+                    const imageData = ctx.getImageData(0, 0, elements.canvas.width, elements.canvas.height);
+                    
+                    // Intentar decodificar código QR
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert"
+                    });
+
+                    if (code && code.data) {
+                        handleScanResult(code.data);
+                        return;
+                    }
+                } catch (err) {
+                    console.error('Error al escanear:', err);
+                }
+            }
+
+            // Continuar escaneando
+            state.animationFrame = requestAnimationFrame(scanFrame);
+        }
+
+        // Manejar resultado del escaneo
+        function handleScanResult(data) {
+            const startTime = Date.now();
+            
+            stopScanning();
+            state.currentResult = data;
+
+            // Actualizar estadísticas
+            state.stats.total++;
+            state.stats.success++;
+            const scanTime = Date.now() - startTime;
+            state.stats.times.push(scanTime);
+            updateStats();
+
+            // Detectar tipo de contenido
+            const contentType = detectContentType(data);
+            
+            // Verificar seguridad
+            const security = checkUrlSecurity(data);
+            
+            // Mostrar badge de seguridad
+            elements.securityBadge.innerHTML = `
+                <span class="security-badge security-${security.level}">
+                    <i class="fas fa-${security.icon}"></i> ${security.text}
+                </span>
+            `;
+
+            // Actualizar tipo
+            elements.resultType.innerHTML = `
+                <i class="fas fa-${contentType.icon}"></i>
+                <span>${contentType.label}</span>
+            `;
+
+            // Mostrar contenido
+            if (contentType.type === 'url') {
+                elements.resultContent.innerHTML = `<a href="${data}" target="_blank" style="color: var(--primary); text-decoration: underline;">${data}</a>`;
+                elements.openBtn.style.display = 'flex';
+            } else {
+                elements.resultContent.textContent = data;
+                elements.openBtn.style.display = 'none';
+            }
+
+            // Mostrar sección de resultados
+            elements.resultSection.style.display = 'block';
+            elements.resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            // Agregar al historial
+            addToHistory(data, contentType);
+
+            // Vibración de éxito
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+
+            showToast('¡Código detectado!', 'success');
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            elements.totalScans.textContent = state.stats.total;
+            elements.successScans.textContent = state.stats.success;
+            
+            if (state.stats.times.length > 0) {
+                const avg = Math.round(
+                    state.stats.times.reduce((a, b) => a + b, 0) / state.stats.times.length
+                );
+                elements.avgTime.textContent = avg + 'ms';
+            }
+        }
+
+        // Agregar al historial
+        function addToHistory(data, contentType) {
+            const timestamp = new Date();
+            const item = {
+                id: Date.now(),
+                data: data,
+                type: contentType,
+                timestamp: timestamp,
+                favorite: false
+            };
+
+            state.history.unshift(item);
+            
+            // Limitar historial a 50 items
+            if (state.history.length > 50) {
+                state.history = state.history.slice(0, 50);
+            }
+
+            renderHistory();
+        }
+
+        // Renderizar historial
+        function renderHistory(filter = '') {
+            const filtered = state.history.filter(item => 
+                item.data.toLowerCase().includes(filter.toLowerCase())
+            );
+
+            if (filtered.length === 0) {
+                elements.historyList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>${filter ? 'No se encontraron resultados' : 'No hay escaneos aún'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            elements.historyList.innerHTML = filtered.map(item => `
+                <div class="history-item" data-id="${item.id}">
+                    <div class="history-content">
+                        <div class="history-text">
+                            <i class="fas fa-${item.type.icon}"></i>
+                            ${item.data.substring(0, 50)}${item.data.length > 50 ? '...' : ''}
+                        </div>
+                        <div class="history-meta">
+                            ${formatDate(item.timestamp)}
+                        </div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn-icon" onclick="copyHistoryItem('${item.id}')" title="Copiar">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button class="btn-icon" onclick="deleteHistoryItem('${item.id}')" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Agregar listeners para clicks en items
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (!e.target.closest('.history-actions')) {
+                        const id = item.dataset.id;
+                        const historyItem = state.history.find(h => h.id == id);
+                        if (historyItem) {
+                            showHistoryItem(historyItem);
+                        }
+                    }
+                });
+            });
+        }
+
+        // Mostrar item del historial
+        function showHistoryItem(item) {
+            state.currentResult = item.data;
+            
+            const security = checkUrlSecurity(item.data);
+            elements.securityBadge.innerHTML = `
+                <span class="security-badge security-${security.level}">
+                    <i class="fas fa-${security.icon}"></i> ${security.text}
+                </span>
+            `;
+
+            elements.resultType.innerHTML = `
+                <i class="fas fa-${item.type.icon}"></i>
+                <span>${item.type.label}</span>
+            `;
+
+            if (item.type.type === 'url') {
+                elements.resultContent.innerHTML = `<a href="${item.data}" target="_blank" style="color: var(--primary); text-decoration: underline;">${item.data}</a>`;
+                elements.openBtn.style.display = 'flex';
+            } else {
+                elements.resultContent.textContent = item.data;
+                elements.openBtn.style.display = 'none';
+            }
+
+            elements.resultSection.style.display = 'block';
+            elements.resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Formatear fecha
+        function formatDate(date) {
+            const now = new Date();
+            const diff = now - date;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return 'Ahora';
+            if (minutes < 60) return `Hace ${minutes}m`;
+            if (hours < 24) return `Hace ${hours}h`;
+            if (days < 7) return `Hace ${days}d`;
+            
+            return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+        }
+
+        // Copiar al portapapeles
+        async function copyToClipboard() {
+            if (!state.currentResult) return;
+            
+            try {
+                await navigator.clipboard.writeText(state.currentResult);
+                showToast('Copiado al portapapeles', 'success');
+            } catch (err) {
+                // Fallback para navegadores que no soportan clipboard API
+                const textarea = document.createElement('textarea');
+                textarea.value = state.currentResult;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('Copiado al portapapeles', 'success');
+                } catch (e) {
+                    showToast('Error al copiar', 'error');
+                }
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // Abrir URL
+        function openUrl() {
+            if (!state.currentResult) return;
+            
+            let url = state.currentResult;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            
+            window.open(url, '_blank', 'noopener,noreferrer');
+            showToast('Abriendo URL...', 'success');
+        }
+
+        // Compartir
+        async function shareResult() {
+            if (!state.currentResult) return;
+
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Código escaneado',
+                        text: state.currentResult
+                    });
+                    showToast('Compartido exitosamente', 'success');
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('Error al compartir:', err);
+                        copyToClipboard();
+                    }
+                }
+            } else {
+                copyToClipboard();
+                showToast('Copiado (compartir no disponible)', 'success');
+            }
+        }
+
+        // Copiar item del historial
+        window.copyHistoryItem = async function(id) {
+            const item = state.history.find(h => h.id == id);
+            if (item) {
+                try {
+                    await navigator.clipboard.writeText(item.data);
+                    showToast('Copiado', 'success');
+                } catch (err) {
+                    showToast('Error al copiar', 'error');
+                }
+            }
+        };
+
+        // Eliminar item del historial
+        window.deleteHistoryItem = function(id) {
+            state.history = state.history.filter(h => h.id != id);
+            renderHistory(elements.searchBox.value);
+            showToast('Eliminado', 'success');
+        };
+
+        // Limpiar historial
+        function clearHistory() {
+            if (state.history.length === 0) {
+                showToast('El historial ya está vacío', 'warning');
+                return;
+            }
+
+            if (confirm('¿Estás seguro de que deseas eliminar todo el historial?')) {
+                state.history = [];
+                renderHistory();
+                showToast('Historial limpiado', 'success');
+            }
+        }
+
+        // Toggle tema
+        function toggleTheme() {
+            state.theme = state.theme === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', state.theme);
+            localStorage.setItem('theme', state.theme);
+            
+            const icon = elements.themeToggle.querySelector('i');
+            icon.className = state.theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            
+            showToast(`Tema ${state.theme === 'dark' ? 'oscuro' : 'claro'} activado`, 'success');
+        }
+
+        // Event Listeners
+        elements.startBtn.addEventListener('click', startScanning);
+        elements.stopBtn.addEventListener('click', stopScanning);
+        elements.copyBtn.addEventListener('click', copyToClipboard);
+        elements.openBtn.addEventListener('click', openUrl);
+        elements.shareBtn.addEventListener('click', shareResult);
+        elements.saveBtn.addEventListener('click', () => {
+            addToHistory(state.currentResult, detectContentType(state.currentResult));
+            showToast('Guardado en historial', 'success');
+        });
+        elements.clearHistory.addEventListener('click', clearHistory);
+        elements.themeToggle.addEventListener('click', toggleTheme);
+        
+        // Búsqueda en tiempo real
+        elements.searchBox.addEventListener('input', (e) => {
+            renderHistory(e.target.value);
+        });
+
+        // Prevenir zoom en iOS
+        document.addEventListener('touchmove', (e) => {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Manejar visibilidad de la página
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && state.scanning) {
+                stopScanning();
+            }
+        });
+
+        // Inicialización
+        function init() {
+            // Aplicar tema guardado
+            document.documentElement.setAttribute('data-theme', state.theme);
+            const icon = elements.themeToggle.querySelector('i');
+            icon.className = state.theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+
+            // Verificar soporte de cámara
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showToast('Tu navegador no soporta acceso a cámara', 'error');
+                elements.startBtn.disabled = true;
+                return;
+            }
+
+            // Verificar jsQR
+            if (!window.jsQR) {
+                showToast('Error cargando librería QR', 'error');
+                elements.startBtn.disabled = true;
+                return;
+            }
+
+            // Cargar historial si existe
+            try {
+                const saved = localStorage.getItem('scanHistory');
+                if (saved) {
+                    state.history = JSON.parse(saved).map(item => ({
+                        ...item,
+                        timestamp: new Date(item.timestamp)
+                    }));
+                    renderHistory();
+                }
+
+                const savedStats = localStorage.getItem('scanStats');
+                if (savedStats) {
+                    state.stats = JSON.parse(savedStats);
+                    updateStats();
+                }
+            } catch (err) {
+                console.error('Error cargando datos:', err);
+            }
+
+            showToast('¡Listo para escanear!', 'success');
+        }
+
+        // Guardar historial antes de cerrar
+        window.addEventListener('beforeunload', () => {
+            try {
+                localStorage.setItem('scanHistory', JSON.stringify(state.history));
+                localStorage.setItem('scanStats', JSON.stringify(state.stats));
+            } catch (err) {
+                console.error('Error guardando datos:', err);
+            }
+        });
+
+        // Atajos de teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && state.scanning) {
+                stopScanning();
+            } else if (e.key === 's' && e.ctrlKey) {
+                e.preventDefault();
+                if (!state.scanning && !elements.startBtn.disabled) {
+                    startScanning();
+                }
+            } else if (e.key === 'c' && e.ctrlKey && state.currentResult) {
+                e.preventDefault();
+                copyToClipboard();
+            }
+        });
+
+        // Iniciar aplicación
+        init();
+    </script>
+</body>
+</html>
